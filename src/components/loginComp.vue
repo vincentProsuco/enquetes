@@ -13,7 +13,7 @@
         </template>
       </q-input>
     </q-card-section>
-    <q-card-actions class="bg-grey-1 flex justify-end">
+    <q-card-actions class="bg-grey-2 flex justify-end">
       <q-btn
         label="inloggen"
         color="primary"
