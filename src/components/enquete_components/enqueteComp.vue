@@ -7,20 +7,26 @@
       </div>
     </div>
     <div class="col-6">
+      <transition-group
+  appear
+  enter-active-class="animated bounce"
+  leave-active-class="animated fadeOut"
+>
       <q-expansion-item
       v-if="errors.length > 0"
         expand-separator
         icon="warning"
         :label="`${errors.length} fout(en)`"
         caption="Los deze eerst op."
-        class="q-mb-md"
+        class="q-mb-md bg-warning"
       >
-     <q-card v-for="error in errors" :key="error" class="bg-negative text-white text-bold q-pa-sm q-my-sm" flat>
+     <q-card v-for="error in errors" :key="error" class="q-pa-sm q-my-sm" flat>
        <span class="">
         <q-icon name="warning" /> {{error.message}}
        </span>
      </q-card>
       </q-expansion-item>
+      </transition-group>
       <div v-if="items.length > 0">
         <div>
           <draggable
