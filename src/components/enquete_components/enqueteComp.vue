@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-gutter-md">
     <div class="col-12 flex justify-center" v-if="items.length < 1">
       <div style="display: flex; flex-direction: column; align-items: center">
         <q-icon size="lg" name="report" color="grey-5" class="q-ma-md" />
@@ -7,6 +7,20 @@
       </div>
     </div>
     <div class="col-6">
+      <q-expansion-item
+      v-if="errors.length > 0"
+        expand-separator
+        icon="warning"
+        :label="`${errors.length} fout(en)`"
+        caption="Los deze eerst op."
+        class="q-mb-md"
+      >
+     <q-card v-for="error in errors" :key="error" class="bg-negative text-white text-bold q-pa-sm q-my-sm" flat>
+       <span class="">
+        <q-icon name="warning" /> {{error.message}}
+       </span>
+     </q-card>
+      </q-expansion-item>
       <div v-if="items.length > 0">
         <div>
           <draggable
@@ -138,7 +152,8 @@
         </q-fab>
     
     </div>
-  </div>
+    </div>
+ 
 
 
 
@@ -154,6 +169,7 @@ import Rating from "../vragen/rating.vue";
 import TussenPagina from "../vragen/tussenPagina.vue";
 export default {
   emits:['updateEvent'],
+  props:['errors'],
   components: {
     draggable,
     MeerKeuze,

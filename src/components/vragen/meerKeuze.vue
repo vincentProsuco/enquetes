@@ -1,7 +1,6 @@
 <template>
   <q-card class="q-pa-md">
     <q-card-section>
-      <!-- <q-input outlined v-model="item.vraag" label="Vraag" @change="showPreview"/> -->
       <q-editor v-model="item.vraag" label="Vraag" @change="showPreview"/>
     </q-card-section>
     <q-card-section>
@@ -52,7 +51,7 @@ export default {
   data() {
     return {
       countq: 2,
-      item: {id:this.q, vraag:"Dit is een voorbeeld vraag...", opties: ["", ""] },
+      item: {id:this.q, vraag:"", opties: ["", ""] },
     };
   },
   methods: {
@@ -65,7 +64,7 @@ export default {
       this.countq--;
     },
     showPreview() {
-      this.$emit("vraag-preview", this.item);
+        this.$emit("vraag-preview", this.item);      
     },
     deleteItem() {
       this.$emit("delete-item", this.q);
