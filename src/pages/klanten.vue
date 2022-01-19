@@ -11,11 +11,12 @@
           no-results-label="Geen resultaten gevonden."
           rows-per-page-label="Rijen per pagina"
           flat
+          class="bg-grey-3"
         >
           <template v-slot:body-cell-akties="props">
             <q-td :props="props">
-              <q-btn size="xs" round flat icon="delete" />
-              <q-btn size="xs" round flat icon="edit" />
+              <q-btn size="xs" round flat icon="delete" @click="deleteKlant(props.row)"/>
+              <q-btn size="xs" round flat icon="edit" @click="editKlant(props.row.id)" />
             </q-td>
           </template>
 
@@ -31,7 +32,7 @@
           </template>
 
           <template v-slot:top-right>
-            <q-input outlined v-model="filter" placeholder="Klant zoeken..">
+            <q-input outlined v-model="filter" placeholder="Klant zoeken.." bg-color="grey-1">
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -43,7 +44,7 @@
               label="Klant toevoegen"
               color="secondary"
               icon="add_business"
-              @click="dialog = true"
+              @click="dialog = true, editable = null"
             />
           </template>
 
@@ -68,8 +69,10 @@
   >
     <q-card style="width: 700px; max-width: 80vw">
       <q-card-section class="flex justify-between"
-        ><span class="text-h6">Klant toevoegen</span
-        ><q-icon
+        >
+        <span class="text-h6" v-if="!editable">Klant toevoegen</span>
+        <span class="text-h6" v-else>{{selectedKlant.klant}} bewerken</span>       
+        <q-icon
           class="clickable"
           name="close"
           flat
@@ -78,7 +81,7 @@
           @click="dialog = false"
       /></q-card-section>
       <q-card-section>
-        <nieuwe-klant-form />
+        <nieuwe-klant-form :klantEdit="selectedKlant"/>
       </q-card-section>
       <q-card-actions class="flex justify-end">
         <q-btn
@@ -110,6 +113,7 @@ export default defineComponent({
   },
   data() {
     return {
+      editable : null,
       dialog: false,
       filter: "",
       columns: [
@@ -130,12 +134,52 @@ export default defineComponent({
         { name: "akties", label: "Akties", field: "akties", sortable: false },
       ],
       rows: [
-        { klant: "Oostappen vakantieparken", campagnes: "2" },
-        { klant: "De Barkhoorn", campagnes: "1" },
-        { klant: "Hoge Hexel", campagnes: "0" },
+        {id:1, klant: "Oostappen vakantieparken", campagnes: "2", logo:'https://www.oostappen.de/media_file/park-icoonpos-og_5fbe4a91a229e.svg', email:'info@oostappen.nl', website:'https://www.oostappenvakantieparken.nl' },
+        {id:2, klant: "De Barkhoorn", campagnes: "1", logo:'https://www.barkhoorn.nl/images/footer-logo.svg', email:'info@debarkhoorn.nl', website:'https://www.debarkhoorn.nl' },
+        {id:3, klant: "Hoge Hexel", campagnes: "0", logo:'https://www.bungalowparkhogehexel.nl/resources/images/logo.png', email:'info@bungalowparkhogehexel.nl', website:'https://www.bungalowparkhogehexel.nl' },
       ],
     };
   },
+  computed:{
+    selectedKlant(){
+      var klantid = this.editable
+      for(var i = 0; i < this.rows.length; i++){
+        if(this.rows[i].id === klantid){
+           return this.rows[i]
+        }
+      }
+      return false
+    }
+  },
+  methods:{
+    deleteKlant(klant){
+      this.$q.dialog({
+          title: `${klant.klant} verwijderen?`,
+          message: `Typ <b>${klant.klant}</b> om te bevestigen. `,
+          prompt: {
+            model: '',
+            isValid:  data => (data === klant.klant), 
+            type: 'text',
+          },
+          html:true,
+          cancel: true,
+          persistent: true
+        }).onOk(data => {
+          //Verwijder klant.id
+          this.$q.notify(
+            {
+              message:`${klant.klant} verwijderd.`,
+              icon:'check'
+            }
+          )
+         
+        })
+    },
+    editKlant(klantId){
+      this.dialog = true
+      this.editable = klantId
+    }
+  }
 });
 </script>
 

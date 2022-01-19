@@ -1,6 +1,6 @@
 <template>
     <div class="row q-pa-lg">
-      <div class="col">
+      <div class="col flex justify-center">
         <span class="vraag" v-html="vraag.waarde.vraag" />
       </div>
     </div>

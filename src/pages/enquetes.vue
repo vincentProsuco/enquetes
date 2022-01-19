@@ -11,6 +11,7 @@
           no-results-label="Geen resultaten gevonden."
           rows-per-page-label="Rijen per pagina"
           flat
+          class="bg-grey-3"
         >
 
             <template v-slot:body-cell-campagne="props">
@@ -41,7 +42,7 @@
 
 
           <template v-slot:top-right>
-            <q-input outlined v-model="filter" placeholder="Enquête zoeken..">
+            <q-input outlined v-model="filter" placeholder="Enquête zoeken.." class="bg-grey-2">
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
