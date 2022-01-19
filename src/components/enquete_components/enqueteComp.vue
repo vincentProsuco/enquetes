@@ -1,31 +1,60 @@
 <template>
   <div class="row q-gutter-md">
-    <div class="col-12 flex justify-center" v-if="items.length < 1">
-      <div style="display: flex; flex-direction: column; align-items: center">
-        <q-icon size="lg" name="report" color="grey-5" class="q-ma-md" />
-        <span>Nog geen vragen toegevoegd...</span>
-      </div>
+    <div class="col-4" v-if="items.length < 1">
+      <q-card flat>
+        <q-card-section class="bg-grey-3">
+          <div class="flex justify-between">
+          <span class="text-grey-8">Begin met het toevoegen van een vraag.</span>
+           <q-icon name="info" color="grey-4" size="sm"/>
+          </div>
+        </q-card-section>
+        <q-list bordered>
+          <q-item clickable
+          v-for="v in vraagSoorten"
+          :key="v.label"
+          @click="addVraag(v.functie)"
+          >
+            <q-item-section top avatar>
+              <q-avatar square :color="v.kleur" text-color="white" :icon="v.icoon" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>{{v.label}}</q-item-label>
+              <q-item-label caption lines="2"
+                >
+                {{v.beschrijving}}
+                </q-item-label
+              >
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
     </div>
     <div class="col-6">
       <transition-group
-  appear
-  enter-active-class="animated bounce"
-  leave-active-class="animated fadeOut"
->
-      <q-expansion-item
-      v-if="errors.length > 0"
-        expand-separator
-        icon="warning"
-        :label="`${errors.length} fout(en)`"
-        caption="Los deze eerst op."
-        class="q-mb-md bg-warning"
+        appear
+        enter-active-class="animated bounce"
+        leave-active-class="animated fadeOut"
       >
-     <q-card v-for="error in errors" :key="error" class="q-pa-sm q-my-sm" flat>
-       <span class="">
-        <q-icon name="warning" /> {{error.message}}
-       </span>
-     </q-card>
-      </q-expansion-item>
+        <q-expansion-item
+          v-if="errors.length > 0"
+          expand-separator
+          icon="warning"
+          :label="`${errors.length} fout(en)`"
+          caption="Los deze eerst op."
+          class="q-mb-md bg-warning"
+        >
+          <q-card
+            v-for="error in errors"
+            :key="error"
+            class="q-pa-sm q-my-sm"
+            flat
+          >
+            <span class="">
+              <q-icon name="warning" /> {{ error.message }}
+            </span>
+          </q-card>
+        </q-expansion-item>
       </transition-group>
       <div v-if="items.length > 0">
         <div>
@@ -38,10 +67,7 @@
           >
             <template #item="{ element }">
               <div id="vraagContainer">
-                <q-expansion-item
-                  expand-separator
-                  expand-icon="edit"
-                >
+                <q-expansion-item expand-separator expand-icon="edit">
                   <template v-slot:header>
                     <div
                       class="flex justify-between q-pa-xs"
@@ -109,61 +135,28 @@
               </div>
             </template>
           </draggable>
-          
         </div>
       </div>
-      
-        <q-fab
-          color="secondary"
-          icon="add"
-          direction="right"
-          style="z-index: 1000"
-          class="q-mt-md"
-        >
-          <q-fab-action
-            color="indigo-9"
-            icon="question_answer"
-            label="Open vraag"
-            square
-            @click="addVraag('Open vraag')"
-          />
-          <q-fab-action
-            color="primary"
-            icon="checklist"
-            label="Meerkeuze"
-            square
-            @click="addVraag('Meerkeuze')"
-          />
-          <q-fab-action
-            color="accent"
-            icon="rule"
-            label="Selecteren"
-            square
-            @click="addVraag('Selecteren')"
-          />
-          <q-fab-action
-            color="orange-6"
-            icon="star"
-            label="Rating"
-            square
-            @click="addVraag('Rating')"
-          />
-          <q-fab-action
-            color="lime-6"
-            icon="article"
-            label="Tussen pagina"
-            square
-            @click="addVraag('Tussen pagina')"
-          />
-        </q-fab>
-    
+
+      <q-fab
+        color="secondary"
+        icon="add"
+        direction="right"
+        style="z-index: 1000"
+        class="q-mt-md"
+        v-if="items.length > 0"
+      >
+        <q-fab-action v-for="v in vraagSoorten"
+        :key="v.label"
+          :color="v.kleur"
+          :icon="v.icoon"
+          :label="v.label"
+          square
+          @click="addVraag(v.functie)"
+        />
+      </q-fab>
     </div>
-    </div>
- 
-
-
-
-
+  </div>
 </template>
 
 <script>
@@ -174,8 +167,8 @@ import OpenVraag from "../vragen/openVraag.vue";
 import Rating from "../vragen/rating.vue";
 import TussenPagina from "../vragen/tussenPagina.vue";
 export default {
-  emits:['updateEvent'],
-  props:['errors'],
+  emits: ["updateEvent"],
+  props: ["errors"],
   components: {
     draggable,
     MeerKeuze,
@@ -186,10 +179,17 @@ export default {
   },
   data() {
     return {
-      items: [], 
+      items: [],
       drag: false,
       ids: 0,
       previewMode: false,
+      vraagSoorten:[
+        {kleur:'indigo-9', label:'Open vraag', icoon:'question_answer', functie:'Open vraag', beschrijving:'Bij een open vraag heeft de gebruiker de mogelijkheid zelf een antwoord te typen.'},
+        {kleur:'primary', label:'Meerkeuze vraag', icoon:'checklist', functie:'Meerkeuze', beschrijving:'De gebruiker heeft de keuze uit meerdere antwoorden en hierbij kunnen er meerdere antwoorden worden geselcteerd.'},
+        {kleur:'accent', label:'Selectie vraag', icoon:'rule', functie:'Selecteren', beschrijving:'De gebruiker heeft de keuze uit meerdere antwoorden maar er kan slechts één antwoord geselecteerd worden.'},
+        {kleur:'orange-6', label:'Rating', icoon:'star', functie:'Rating', beschrijving:'Gebruikers kunnen hun mening geven op basis van een schaal van 1 tot 5. Dit kan d.m.v. cijfers, tekst, emoticons of sterren.'},
+        {kleur:'lime-6', label:'Tussen Pagina', icoon:'article', functie:'Tussen pagina', beschrijving:'Met een tussenpagina kun je de gebruiker bijvoorbeeld extra informatie geven over de komende vragen.'},
+      ]
     };
   },
   methods: {
@@ -211,14 +211,14 @@ export default {
       }
     },
   },
-  watch:{
+  watch: {
     items: {
       deep: true,
-      handler(){
-        this.$emit('updateEvent', this.items)
-      }
-        }
-  }
+      handler() {
+        this.$emit("updateEvent", this.items);
+      },
+    },
+  },
 };
 </script>
 
