@@ -5,7 +5,7 @@
     </q-card-section>
     <q-card-section>
       <!-- <q-input outlined v-model="item.vraag" label="Vraag" @change="showPreview"/> -->
-      <q-editor v-model="item.vraag" label="Vraag" @change="showPreview"/>
+      <q-editor v-model="item.vraag" label="Vraag" @change="showPreview" :toolbar="toolbar"/>
     </q-card-section>
     <q-card-section>
       <q-select
@@ -72,6 +72,7 @@ export default {
   emits: ["vraag-preview", "delete-item"],
   data() {
     return {
+      toolbar:this.$store.state.toolbar.toolbar,
       countq: 2,
       item: {id:this.q, vraag: "", type: "", opties: ["", ""], verplicht:false },
       options: [

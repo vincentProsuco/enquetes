@@ -53,9 +53,7 @@ export default {
   },
   data() {
     return {
-      toolbar:[
-        ['bold', 'italic', 'underline'],
-      ],
+      toolbar:this.$store.state.toolbar.toolbar,
       countq: 2,
       item: {id:this.q, vraag:"Dit is een voorbeeld vraag.", opties: ["", ""], verplicht:false },
     };

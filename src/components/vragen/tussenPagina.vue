@@ -1,7 +1,7 @@
 <template>
   <q-card class="q-pa-md">
     <q-card-section>
-      <q-editor v-model="item.vraag" @keyup="showPreview"/>
+      <q-editor v-model="item.vraag" @keyup="showPreview" :toolbar="toolbar"/>
     </q-card-section>
     <q-card-section>
     </q-card-section>
@@ -24,6 +24,7 @@ export default {
   emits: ["vraag-preview", "delete-item"],
   data() {
     return {
+      toolbar:this.$store.state.toolbar.toolbar,
       item: {id:this.q, vraag:""},
     }
   },

@@ -5,7 +5,7 @@
     </q-card-section>
     <q-card-section>
       <!-- <q-input outlined  v-model="item.titel" label="Titel"/> -->
-      <q-editor v-model="item.titel" label="Titel"/>
+      <q-editor v-model="item.titel" label="Titel" :toolbar="toolbar"/>
     </q-card-section>
     <q-card-section v-for="(vr, ii) in item.vraag" :key="ii">
       <q-input
@@ -121,6 +121,7 @@ export default {
   },
   data() {
     return {
+      toolbar:this.$store.state.toolbar.toolbar,
       rating_icon: ["circle", "circle", "circle", "circle", "circle"],
       countq: 2,
       countv: 1,
