@@ -1,6 +1,9 @@
 <template>
   <q-card class="q-pa-md">
     <q-card-section>
+       <q-toggle v-model="item.verplicht" label="Antwoord verplicht?" dense size="sm" icon="close" checked-icon="check"/>
+    </q-card-section>
+    <q-card-section>
       <q-editor v-model="item.vraag" label="Vraag" @change="showPreview"/>
     </q-card-section>
     <q-card-section>
@@ -28,7 +31,7 @@
     <q-card-section class="flex justify-center">
       <q-btn round color="secondary" icon="add" @click="addAntwoord" />
     </q-card-section>
-    <q-card-actions>
+    <q-card-actions class="flex justify-between">
       <q-btn
         color="red"
         flat
@@ -51,7 +54,7 @@ export default {
   data() {
     return {
       countq: 2,
-      item: {id:this.q, vraag:"", opties: ["", ""] },
+      item: {id:this.q, vraag:"Dit is een voorbeeld vraag.", opties: ["", ""], verplicht:false },
     };
   },
   methods: {

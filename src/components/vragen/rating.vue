@@ -1,6 +1,9 @@
 <template>
   <q-card class="q-pa-md">
     <q-card-section>
+       <q-toggle v-model="item.verplicht" label="Antwoord verplicht?" dense size="sm" icon="close" checked-icon="check"/>
+    </q-card-section>
+    <q-card-section>
       <!-- <q-input outlined  v-model="item.titel" label="Titel"/> -->
       <q-editor v-model="item.titel" label="Titel"/>
     </q-card-section>
@@ -133,6 +136,7 @@ export default {
           { label: "Goed" },
           { label: "Fantastisch" },
         ],
+        verplicht:false,
       },
       options: [
         {
