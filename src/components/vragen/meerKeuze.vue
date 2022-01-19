@@ -4,7 +4,7 @@
        <q-toggle v-model="item.verplicht" label="Antwoord verplicht?" dense size="sm" icon="close" checked-icon="check"/>
     </q-card-section>
     <q-card-section>
-      <q-editor v-model="item.vraag" label="Vraag" @change="showPreview"/>
+      <q-editor v-model="item.vraag" label="Vraag" @change="showPreview" :toolbar="toolbar"/>
     </q-card-section>
     <q-card-section>
       <q-input
@@ -53,6 +53,9 @@ export default {
   },
   data() {
     return {
+      toolbar:[
+        ['bold', 'italic', 'underline'],
+      ],
       countq: 2,
       item: {id:this.q, vraag:"Dit is een voorbeeld vraag.", opties: ["", ""], verplicht:false },
     };
