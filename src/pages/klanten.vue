@@ -15,8 +15,20 @@
         >
           <template v-slot:body-cell-akties="props">
             <q-td :props="props">
-              <q-btn size="xs" round flat icon="delete" @click="deleteKlant(props.row)"/>
-              <q-btn size="xs" round flat icon="edit" @click="editKlant(props.row.id)" />
+              <q-btn
+                size="xs"
+                round
+                flat
+                icon="delete"
+                @click="deleteKlant(props.row)"
+              />
+              <q-btn
+                size="xs"
+                round
+                flat
+                icon="edit"
+                @click="editKlant(props.row.id)"
+              />
             </q-td>
           </template>
 
@@ -32,7 +44,12 @@
           </template>
 
           <template v-slot:top-right>
-            <q-input outlined v-model="filter" placeholder="Klant zoeken.." bg-color="grey-1">
+            <q-input
+              outlined
+              v-model="filter"
+              placeholder="Klant zoeken.."
+              bg-color="grey-1"
+            >
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -44,7 +61,7 @@
               label="Klant toevoegen"
               color="secondary"
               icon="add_business"
-              @click="dialog = true, editable = null"
+              @click="(dialog = true), (editable = null)"
             />
           </template>
 
@@ -68,10 +85,9 @@
     transition-hide="slide-down"
   >
     <q-card style="width: 700px; max-width: 80vw">
-      <q-card-section class="flex justify-between"
-        >
+      <q-card-section class="flex justify-between">
         <span class="text-h6" v-if="!editable">Klant toevoegen</span>
-        <span class="text-h6" v-else>{{selectedKlant.klant}} bewerken</span>       
+        <span class="text-h6" v-else>{{ selectedKlant.klant }} bewerken</span>
         <q-icon
           class="clickable"
           name="close"
@@ -81,17 +97,11 @@
           @click="dialog = false"
       /></q-card-section>
       <q-card-section>
-        <nieuwe-klant-form :klantEdit="selectedKlant"/>
-      </q-card-section>
-      <q-card-actions class="flex justify-end">
-        <q-btn
-          icon="save"
-          flat
-          label="Opslaan"
-          color="secondary"
-          @click="dialog = false"
+        <nieuwe-klant-form
+          :klantEdit="selectedKlant"
+          @addKlantResult="klantAdded($event)"
         />
-      </q-card-actions>
+      </q-card-section>
     </q-card>
   </q-dialog>
 </template>
@@ -100,20 +110,23 @@
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import nieuweKlantForm from "src/components/nieuweKlantForm.vue";
-
+import { api } from "boot/axios";
 export default defineComponent({
   components: { nieuweKlantForm },
   name: "PageIndex",
+
+  
   setup() {
     const $q = useQuasar();
     $q.loadingBar.start();
   },
   mounted() {
+    this.reloadKlanten()
     this.$q.loadingBar.stop();
   },
   data() {
     return {
-      editable : null,
+      editable: null,
       dialog: false,
       filter: "",
       columns: [
@@ -133,53 +146,72 @@ export default defineComponent({
         },
         { name: "akties", label: "Akties", field: "akties", sortable: false },
       ],
-      rows: [
-        {id:1, klant: "Oostappen vakantieparken", campagnes: "2", logo:'https://www.oostappen.de/media_file/park-icoonpos-og_5fbe4a91a229e.svg', email:'info@oostappen.nl', website:'https://www.oostappenvakantieparken.nl' },
-        {id:2, klant: "De Barkhoorn", campagnes: "1", logo:'https://www.barkhoorn.nl/images/footer-logo.svg', email:'info@debarkhoorn.nl', website:'https://www.debarkhoorn.nl' },
-        {id:3, klant: "Hoge Hexel", campagnes: "0", logo:'https://www.bungalowparkhogehexel.nl/resources/images/logo.png', email:'info@bungalowparkhogehexel.nl', website:'https://www.bungalowparkhogehexel.nl' },
-      ],
+      rows: [],
     };
   },
-  computed:{
-    selectedKlant(){
-      var klantid = this.editable
-      for(var i = 0; i < this.rows.length; i++){
-        if(this.rows[i].id === klantid){
-           return this.rows[i]
+  computed: {
+    selectedKlant() {
+      var klantid = this.editable;
+      for (var i = 0; i < this.rows.length; i++) {
+        if (this.rows[i].id === klantid) {
+          return this.rows[i];
         }
       }
-      return false
-    }
+      return false;
+    },
   },
-  methods:{
-    deleteKlant(klant){
-      this.$q.dialog({
+  methods: {
+    deleteKlant(klant) {
+      this.$q
+        .dialog({
           title: `${klant.klant} verwijderen?`,
           message: `Typ <b>${klant.klant}</b> om te bevestigen. `,
           prompt: {
-            model: '',
-            isValid:  data => (data === klant.klant), 
-            type: 'text',
+            model: "",
+            isValid: (data) => data === klant.klant,
+            type: "text",
           },
-          html:true,
+          html: true,
           cancel: true,
-          persistent: true
-        }).onOk(data => {
-          //Verwijder klant.id
-          this.$q.notify(
-            {
-              message:`${klant.klant} verwijderd.`,
-              icon:'check'
-            }
-          )
-         
+          persistent: true,
         })
+        .onOk((data) => {
+          //Verwijder klant.id
+          this.$q.notify({
+            message: `${klant.klant} verwijderd.`,
+            icon: "check",
+          });
+        });
     },
-    editKlant(klantId){
-      this.dialog = true
-      this.editable = klantId
-    }
-  }
+    editKlant(klantId) {
+      this.dialog = true;
+      this.editable = klantId;
+    },
+    klantAdded(mess) {
+      this.dialog = false;
+      this.reloadKlanten()
+      this.$q.notify({
+        message: mess,
+        icon: "check",
+      });
+    },
+    reloadKlanten() {
+      this.rows =[]
+      api.get("/klanten").then(response=>{
+         for (var i = 0; i < response.data.data.length; i++) {
+          this.rows.push({
+          id: response.data.data[i].attributes.id,
+          klant: response.data.data[i].attributes.naam,
+          campagnes: "2",
+          logo: "https://www.oostappen.de/media_file/park-icoonpos-og_5fbe4a91a229e.svg",
+          email: response.data.data[i].attributes.mail,
+          website: response.data.data[i].attributes.website,
+        });
+      }
+      })
+     
+    },
+  },
 });
 </script>
 

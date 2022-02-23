@@ -96,7 +96,7 @@ import { ref } from 'vue'
 export default {
   props:['save'],
   async created(){
-    const fonts = await api.get();
+    const fonts = await api.get("https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBASHqu0mr38ma56itFmG_h5rzGISwXY0c");
     for(var i =0; i < fonts.data.items.length; i++){
       this.rows.push(
         {
