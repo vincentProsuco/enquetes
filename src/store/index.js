@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import googlefonts from './googlefonts'
 import toolbar from './toolbar'
 
+
 // import example from './module-example'
 
 /*
@@ -18,7 +19,7 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       googlefonts,
-      toolbar
+      toolbar,
     },
 
     // enable strict mode (adds overhead!)

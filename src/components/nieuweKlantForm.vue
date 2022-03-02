@@ -50,6 +50,7 @@
       color="secondary"
       @click="saveKlant"
     />
+    {{klant.id}}
   </q-card-actions>
 </template>
 
@@ -65,6 +66,7 @@ export default {
         website: this.klantEdit.website,
         email: this.klantEdit.email,
         logo: this.klantEdit.logo,
+        id:this.klantEdit.id,
       },
     };
   },
@@ -78,11 +80,21 @@ export default {
           website: this.klant.website,
         },
       };
-      api.post("/klanten", formData).then(
+      if(this.klant.id){
+        api.put(`/klanten/${this.klant.id}`, formData).then(
+        this.$emit("addKlantResult", "Wijzigingen opgeslagen")
+      )
+
+      }
+      else{
+        api.post("/klanten", formData).then(
         this.$emit("addKlantResult", "Klant toegevoegd")
       )
+        }
     },
-  },
+ 
+ 
+ },
 };
 </script>
 

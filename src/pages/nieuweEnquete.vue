@@ -1,63 +1,67 @@
 <template>
-    <q-toolbar class="bg-grey-3 flex justify-between">
-      <q-tabs class="text-grey-8" v-model="activeTab" inline-label>
-        <q-tab
-          :name="stap.titel"
-          :icon="stap.icon"
-          :label="stap.titel"
-          v-for="stap in stappen"
-          :key="stap"
-        />
-      </q-tabs>
-      <div class="">
-           <span><q-btn
-        icon="remove_red_eye"
-        label="preview"
-        color="primary"
-        class="q-mr-sm"
-        @click="previewMode = true"
-        :disabled="preview"
-        unelevated
+  <q-toolbar class="bg-grey-3 flex justify-between">
+    <q-tabs class="text-grey-8" v-model="activeTab" inline-label>
+      <q-tab
+        :name="stap.titel"
+        :icon="stap.icon"
+        :label="stap.titel"
+        v-for="stap in stappen"
+        :key="stap"
       />
-       <q-tooltip style="overflow:hidden;" v-if="preview">
-          <strong v-if="enquete.vragen">Sla eerst je wijzigingen op</strong> 
-          <strong v-else>Voeg eerst een vraag toe.</strong> 
+    </q-tabs>
+    <div class="">
+      <span
+        ><q-btn
+          icon="remove_red_eye"
+          label="preview"
+          color="primary"
+          class="q-mr-sm"
+          @click="previewMode = true"
+          :disabled="preview"
+          unelevated
+        />
+        <q-tooltip style="overflow: hidden" v-if="preview">
+          <strong v-if="enquete.vragen">Sla eerst je wijzigingen op</strong>
+          <strong v-else>Voeg eerst een vraag toe.</strong>
         </q-tooltip>
       </span>
       <span>
-      <q-btn
-        label="Opslaan"
-        color="secondary"
-        icon="save"
-        :disabled="save"
-        @click="saveEnquete"
-        unelevated
-      />
-        <q-tooltip style="overflow:hidden;" v-if="save">
-          <strong>Geen wijzigingen</strong> 
+        <q-btn
+          label="Opslaan"
+          color="secondary"
+          icon="save"
+          :disabled="save"
+          @click="saveEnquete"
+          unelevated
+        />
+        <q-tooltip style="overflow: hidden" v-if="save">
+          <strong>Geen wijzigingen</strong>
         </q-tooltip>
       </span>
-      </div>
-    </q-toolbar>
-  
-    <q-tab-panels animated v-model="activeTab" style="width:100%;" class="" keep-alive>
-      
-      <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
-        <q-card flat>
-          <q-card-section style="height:100%;">
-            <component :is="stap.content" @updateEvent="updateEvent($event)" :errors="errors"/>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
-      
-      
-    </q-tab-panels>
-    <q-page-sticky
-      position="bottom"
-      :offset="[0, 0]"
-      class="flex flex-end q-pa-md rounded"
-    >
-    </q-page-sticky>
+    </div>
+  </q-toolbar>
+
+  <q-tab-panels
+    animated
+    v-model="activeTab"
+    style="width: 100%"
+    class=""
+    keep-alive
+  >
+    <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
+      <q-card flat>
+        <q-card-section style="height: 100%">
+          <component :is="stap.content" @updateEvent="updateEvent($event)" />
+        </q-card-section>
+      </q-card>
+    </q-tab-panel>
+  </q-tab-panels>
+  <q-page-sticky
+    position="bottom"
+    :offset="[0, 0]"
+    class="flex flex-end q-pa-md rounded"
+  >
+  </q-page-sticky>
 
   <!-- preview popup -->
 
@@ -81,6 +85,7 @@ import enqueteComp from "src/components/enquete_components/enqueteComp.vue";
 import stijlComp from "src/components/enquete_components/stijlComp.vue";
 import instellingenComp from "src/components/enquete_components/instellingenComp.vue";
 import EnquetePreview from "src/components/enquete_components/enquetePreview.vue";
+import { api } from "boot/axios";
 
 export default defineComponent({
   components: { enqueteComp, stijlComp, instellingenComp, EnquetePreview },
@@ -94,12 +99,14 @@ export default defineComponent({
   },
   data() {
     return {
-      preview:true,
-      save:true,
+      latestId: null,
+      latestVraagId: null,
+      preview: true,
+      save: true,
       activeTab: "Instellingen",
       previewMode: false,
       step: 1,
-      errors:[],
+      errors: [],
       stappen: [
         {
           nr: 1,
@@ -118,45 +125,73 @@ export default defineComponent({
     };
   },
   methods: {
-    updateEvent(e){
-      this.enquete.vragen = e;
+    updateEvent(e) {
+      if (e.soort === "setting") {
+        this.enquete.settings = e.val;
+      }
+      if (e.soort === "vragen") {
+        this.enquete.vragen = e.val;
+      }
+
       this.save = false;
     },
-    saveEnquete(){
-      if(this.validateAll(this.enquete)){
-       // Opslaan in DB 
+    saveEnquete() {
+      var formData = {
+        settings: {
+          data: {
+            naam: this.enquete.settings.naam,
+            klant: this.enquete.settings.klant.value,
+            status: String(this.enquete.settings.status),
+            eindtext: this.enquete.settings.eindtext,
+          }
+        },
+        vragen: {
+          data: {
+            vraag: this.enquete.vragen[0].waarde.vraag,
+            type: this.enquete.vragen[0].type,
+            enquete: this.latestId,
+          }
+        },
+      };
+      // Opslaan in DB
+      if (this.latestId === null) {
+        api.post(`/enquetes/`, formData.settings).then((response) => {
+          this.latestId = response.data.data.id;
+          this.formData.vragen.data.enquete = response.data.data.id;
+        });
+      } else {
+        api.put(`/enquetes/${this.latestId}`, formData.settings);
+      }
+
+      if (this.latestVraagId === null) {
+        api.post(`/vragen/`, formData.vragen).then((response) => {
+          this.latestVraagId = response.data.data.id;
+        });
+      } else {
+        api.put(`/vragen/${this.latestVraagId}`, formData.vragen);
+      }
+
       this.save = true;
-      this.$q.notify(
-        {
-          message:'Wijzigingen opgeslagen',
-          icon:'check',
-          color:'secondary'
-        }
-      )
-      }
+      this.$q.notify({
+        message: "Wijzigingen opgeslagen",
+        icon: "check",
+        color: "secondary",
+      });
     },
-    validateAll(e){
-      this.errors = []
-      for(var v = 0; v < e.vragen.length; v++){
-        var vraag = e.vragen[v].waarde
-        if(vraag.vraag === '' || vraag.vraag === '&nbsp;'){
-          this.errors.push({type:'negative', message:`Vraag ${v+1} mag niet leeg zijn!`, closeBtn:true, timeout:99999, position:'bottom', textColor:'white'})
-        }
-      }
-      if(this.errors.length < 1){
-        return true
-      }
-    }
   },
-  watch:{
-    save(){
-      if(this.save === false || this.enquete.vragen === null || !this.enquete.vragen || this.enquete.vragen.length < 1) {
+  watch: {
+    save() {
+      if (
+        this.save === false ||
+        this.enquete.vragen === null ||
+        !this.enquete.vragen ||
+        this.enquete.vragen.length < 1
+      ) {
         this.preview = true;
-      }           
-      else{
+      } else {
         this.preview = false;
       }
-    }
-  }
+    },
+  },
 });
 </script>

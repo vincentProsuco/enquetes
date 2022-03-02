@@ -111,17 +111,19 @@ import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import nieuweKlantForm from "src/components/nieuweKlantForm.vue";
 import { api } from "boot/axios";
+
+
 export default defineComponent({
   components: { nieuweKlantForm },
   name: "PageIndex",
 
-  
   setup() {
     const $q = useQuasar();
+    
     $q.loadingBar.start();
   },
   mounted() {
-    this.reloadKlanten()
+    this.reloadKlanten();
     this.$q.loadingBar.stop();
   },
   data() {
@@ -177,10 +179,17 @@ export default defineComponent({
         })
         .onOk((data) => {
           //Verwijder klant.id
+          api.delete(`klanten/${klant.id}`)
+          .then((response) => {
+            this.reloadKlanten()
+          })
+          
           this.$q.notify({
             message: `${klant.klant} verwijderd.`,
             icon: "check",
           });
+        
+        
         });
     },
     editKlant(klantId) {
@@ -189,27 +198,32 @@ export default defineComponent({
     },
     klantAdded(mess) {
       this.dialog = false;
-      this.reloadKlanten()
+      this.reloadKlanten();
       this.$q.notify({
         message: mess,
         icon: "check",
       });
     },
     reloadKlanten() {
-      this.rows =[]
-      api.get("/klanten").then(response=>{
-         for (var i = 0; i < response.data.data.length; i++) {
+      this.rows = [];
+      api.get("/klanten?populate=*").then((response) => {
+        for (var i = 0; i < response.data.data.length; i++) {
+          var aantalenq = 0
+          for(var e = 0; e < response.data.data[i].enquetes; e++){
+            aantalenq++            
+          }
+
           this.rows.push({
-          id: response.data.data[i].attributes.id,
-          klant: response.data.data[i].attributes.naam,
-          campagnes: "2",
-          logo: "https://www.oostappen.de/media_file/park-icoonpos-og_5fbe4a91a229e.svg",
-          email: response.data.data[i].attributes.mail,
-          website: response.data.data[i].attributes.website,
-        });
-      }
-      })
-     
+            id: response.data.data[i].attributes.id,
+            klant: response.data.data[i].attributes.naam,
+            campagnes: aantalenq,
+            logo: "https://www.oostappen.de/media_file/park-icoonpos-og_5fbe4a91a229e.svg",
+            email: response.data.data[i].attributes.mail,
+            website: response.data.data[i].attributes.website,
+            id:response.data.data[i].id,
+          });
+        }
+      });
     },
   },
 });
