@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import googlefonts from './googlefonts'
 import toolbar from './toolbar'
 
+
 // import example from './module-example'
 
 /*

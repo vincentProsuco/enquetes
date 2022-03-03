@@ -1,11 +1,12 @@
 <template>
   <div class="row q-gutter-md">
     <div class="col-4" v-if="items.length < 1">
-      <q-card flat>
+      <q-card  flat>
         <q-card-section class="bg-grey-3">
-          <div class="flex justify-between">
-          <span class="text-grey-8">Begin met het toevoegen van een vraag.</span>
-           <q-icon name="info" color="grey-4" size="sm"/>
+          <div class="">
+          <q-icon name="o_info" color="grey-4" size="sm"/>
+          <span class="q-ml-md text-grey-8">Begin met het toevoegen van een vraag.</span>
+           
           </div>
         </q-card-section>
         <q-list bordered>
@@ -31,31 +32,6 @@
       </q-card>
     </div>
     <div class="col-6">
-      <transition-group
-        appear
-        enter-active-class="animated bounce"
-        leave-active-class="animated fadeOut"
-      >
-        <q-expansion-item
-          v-if="errors.length > 0"
-          expand-separator
-          icon="warning"
-          :label="`${errors.length} fout(en)`"
-          caption="Los deze eerst op."
-          class="q-mb-md bg-warning"
-        >
-          <q-card
-            v-for="error in errors"
-            :key="error"
-            class="q-pa-sm q-my-sm"
-            flat
-          >
-            <span class="">
-              <q-icon name="warning" /> {{ error.message }}
-            </span>
-          </q-card>
-        </q-expansion-item>
-      </transition-group>
       <div v-if="items.length > 0">
         <div>
           <draggable
@@ -67,11 +43,11 @@
           >
             <template #item="{ element }">
               <div id="vraagContainer">
-                <q-expansion-item expand-separator expand-icon="edit">
+                <q-expansion-item expand-separator expand-icon="edit" class="bg-grey-3">
                   <template v-slot:header>
                     <div
                       class="flex justify-between q-pa-xs"
-                      style="width: 100%; height: 100%"
+                      style="width: 100%; height: 100%;"
                     >
                       <q-icon name="drag_indicator" size="sm" />
                       <span v-if="element.type === 'Open vraag'"
@@ -101,6 +77,7 @@
                       <span></span>
                     </div>
                   </template>
+                  <q-card class="q-pa-md bg-grey-1">
                   <meer-keuze
                     v-if="element.type === 'Meerkeuze'"
                     :q="element.id"
@@ -131,6 +108,7 @@
                     @delete-item="deleteItem($event)"
                     @vraag-preview="updateItems($event, false)"
                   />
+                  </q-card>
                 </q-expansion-item>
               </div>
             </template>
@@ -168,7 +146,6 @@ import Rating from "../vragen/rating.vue";
 import TussenPagina from "../vragen/tussenPagina.vue";
 export default {
   emits: ["updateEvent"],
-  props: ["errors"],
   components: {
     draggable,
     MeerKeuze,

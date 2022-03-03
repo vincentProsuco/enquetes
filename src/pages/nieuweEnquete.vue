@@ -45,7 +45,7 @@
       <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
         <q-card flat>
           <q-card-section style="height:100%;">
-            <component :is="stap.content" @updateEvent="updateEvent($event)" :errors="errors"/>
+            <component :is="stap.content" @updateEvent="updateEvent($event)"/>
           </q-card-section>
         </q-card>
       </q-tab-panel>
@@ -99,7 +99,6 @@ export default defineComponent({
       activeTab: "Instellingen",
       previewMode: false,
       step: 1,
-      errors:[],
       stappen: [
         {
           nr: 1,
@@ -123,7 +122,7 @@ export default defineComponent({
       this.save = false;
     },
     saveEnquete(){
-      if(this.validateAll(this.enquete)){
+     
        // Opslaan in DB 
       this.save = true;
       this.$q.notify(
@@ -133,20 +132,8 @@ export default defineComponent({
           color:'secondary'
         }
       )
-      }
+      
     },
-    validateAll(e){
-      this.errors = []
-      for(var v = 0; v < e.vragen.length; v++){
-        var vraag = e.vragen[v].waarde
-        if(vraag.vraag === '' || vraag.vraag === '&nbsp;'){
-          this.errors.push({type:'negative', message:`Vraag ${v+1} mag niet leeg zijn!`, closeBtn:true, timeout:99999, position:'bottom', textColor:'white'})
-        }
-      }
-      if(this.errors.length < 1){
-        return true
-      }
-    }
   },
   watch:{
     save(){

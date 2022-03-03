@@ -1,12 +1,8 @@
 <template>
   <q-layout view="lHh Lpr LFF">
     <q-header>
-      <q-toolbar
-        :class="modeIcon ? 'bg-primary' : 'bg-grey-8'"
-        class="shadow-2"
-      >
-        <!-- <q-btn :ripple="false" dense flat icon="subject" @click="drawer = !drawer" size="xs"/> -->
-
+      <q-toolbar class="bg-grey-3">
+        
       </q-toolbar>
     </q-header>
 
@@ -19,30 +15,29 @@
     >
       <q-list>
         <q-item class="flex flex-center q-pa-md">
-        <q-avatar rounded class="q-my-sm" size="64px">
-          <q-img :src="require('assets/prosucoLogo.png')" />
-        </q-avatar>
+          <q-avatar rounded class="q-my-sm" size="64px">
+            <q-img :src="require('assets/prosucoLogo.png')" />
+          </q-avatar>
         </q-item>
         <q-item
-          clickable
-          v-ripple
-          v-for="link in menuItems"
+          v-for="(link, index) in menuItems"
           :key="link"
           :to="link.url"
           class="menuItem"
           active-class="bg-primary"
-        
+          @click="activeIcon(index)"
         >
           <q-item-section>
-            <q-icon color="grey-2" :name="link.icon" />
+            <q-icon color="grey-2" :name="link.isActive ? link.activeIcon:link.icon" size="24px"/>
           </q-item-section>
-          <q-item-section class="text-grey-2 text-bold">{{ link.naam }}</q-item-section>
+          <q-item-section class="text-grey-2">{{
+            link.naam
+          }}</q-item-section>
         </q-item>
-
       </q-list>
     </q-drawer>
 
-    <q-page-container class="window-height">
+    <q-page-container class="d-flex flex-center">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -64,10 +59,10 @@ export default {
       modeIcon: true,
       drawer: false,
       menuItems: [
-        { naam: "Dashboard", link: "/", icon: "space_dashboard", url: "/" },
-        { naam: "Klanten", link: "/", icon: "store", url: "/klanten" },
-        { naam: "Enquetes", link: "/", icon: "ballot", url: "/enquetes" },
-        { naam: "Instellingen", link: "/", icon: "tune", url: "/instellingen" },
+        { naam: "Dashboard", link: "/", icon: "o_space_dashboard", activeIcon:'space_dashboard', isActive:true, url: "/" },
+        { naam: "Klanten", link: "/", icon: "o_store", activeIcon:'store', isActive:false, url: "/klanten" },
+        { naam: "Enquetes", link: "/", icon: "o_ballot", activeIcon:'ballot', isActive:false, url: "/enquetes" },
+        { naam: "Instellingen", link: "/", icon: "o_tune", activeIcon:'tune', isActive:false, url: "/instellingen" },
       ],
     };
   },
@@ -76,22 +71,32 @@ export default {
       this.$q.dark.toggle();
       this.modeIcon = !this.modeIcon;
     },
+    activeIcon(e){
+      for(var i = 0; i < this.menuItems.length; i++){
+        this.menuItems[i].isActive = false
+      }
+      this.menuItems[e].isActive = true
+    }
   },
 };
 </script>
 
 <style>
-.menuItem{
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-items: center;
-justify-content: center;
-height:5rem;
-padding:1rem;
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  height: 5rem;
+  padding: 1rem;
+  font-weight: 300;
+  line-height: 1.5rem;
+  letter-spacing: 0.05rem;
+  font-size: 0.75rem;
 }
 
-.menuItem:hover{
+.menuItem:hover {
   background-color: rgba(248, 242, 242, 0.144);
 }
 </style>

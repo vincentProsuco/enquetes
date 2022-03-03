@@ -34,13 +34,6 @@
         </div>
   </div>
     </div>
-  <div class="col-2">
-     <q-uploader
-        url="http://localhost:4444/upload"
-        label="Logo"
-        flat
-      />
-  </div>
   </div>
 </template>
 
