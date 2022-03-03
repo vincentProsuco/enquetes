@@ -1,6 +1,6 @@
 <template>
-    <q-toolbar class="bg-grey-3 flex justify-between">
-      <q-tabs class="text-grey-8" v-model="activeTab" inline-label>
+    <q-toolbar class="bg-primary flex justify-between">
+      <q-tabs class="text-grey-2" v-model="activeTab" inline-label>
         <q-tab
           :name="stap.titel"
           :icon="stap.icon"

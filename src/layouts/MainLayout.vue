@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr LFF">
     <q-header>
       <q-toolbar class="bg-grey-3">
-        
+        <q-img :src="require('assets/prosuco-logo.png')" class="" style="width:128px;"/>
       </q-toolbar>
     </q-header>
 
@@ -15,9 +15,9 @@
     >
       <q-list>
         <q-item class="flex flex-center q-pa-md">
-          <q-avatar rounded class="q-my-sm" size="64px">
-            <q-img :src="require('assets/prosucoLogo.png')" />
-          </q-avatar>
+          
+            
+          
         </q-item>
         <q-item
           v-for="(link, index) in menuItems"
@@ -98,5 +98,8 @@ export default {
 
 .menuItem:hover {
   background-color: rgba(248, 242, 242, 0.144);
+}
+.logo{
+  filter: brightness(0) invert(1);
 }
 </style>
