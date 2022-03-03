@@ -7,7 +7,7 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBASHqu0mr38ma56itFmG_h5rzGISwXY0c' })
+const api = axios.create({ baseURL: '' })
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

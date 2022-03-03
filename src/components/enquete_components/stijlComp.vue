@@ -90,32 +90,20 @@
 </template>
 
 <script>
-import { api } from 'boot/axios'
+import { useStore } from 'vuex'
 import { ref } from 'vue'
 
 export default {
   props:['save'],
-  async created(){
-    const fonts = await api.get();
-    for(var i =0; i < fonts.data.items.length; i++){
-      this.rows.push(
-        {
-        label:fonts.data.items[i].family,
-        type:fonts.data.items[i].category,
-        value:fonts.data.items[i].files.regular
-        }
-      )
-      this.stringOptions.push(
-        fonts.data.items[i].family
-      )
-    }
-    
-  }, 
+  setup(){
+    var $store = useStore()
+    $store.dispatch('googlefonts/getFonts') 
+  },
   data() {
     return {
       options:ref(this.rows),
       stringOptions:[],
-      rows:[],
+      rows:this.$store.state.googlefonts.googlefonts,
       showFonts:false,
       loading: false,
       stijl: {
