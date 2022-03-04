@@ -1,63 +1,67 @@
 <template>
-    <q-toolbar class="bg-primary flex justify-between">
-      <q-tabs class="text-grey-2" v-model="activeTab" inline-label>
-        <q-tab
-          :name="stap.titel"
-          :icon="stap.icon"
-          :label="stap.titel"
-          v-for="stap in stappen"
-          :key="stap"
-        />
-      </q-tabs>
-      <div class="">
-           <span><q-btn
-        icon="remove_red_eye"
-        label="preview"
-        color="primary"
-        class="q-mr-sm"
-        @click="previewMode = true"
-        :disabled="preview"
-        unelevated
+  <q-toolbar class="bg-primary flex justify-between">
+    <q-tabs class="text-grey-2" v-model="activeTab" inline-label>
+      <q-tab
+        :name="stap.titel"
+        :icon="stap.icon"
+        :label="stap.titel"
+        v-for="stap in stappen"
+        :key="stap"
       />
-       <q-tooltip style="overflow:hidden;" v-if="preview">
-          <strong v-if="enquete.vragen">Sla eerst je wijzigingen op</strong> 
-          <strong v-else>Voeg eerst een vraag toe.</strong> 
+    </q-tabs>
+    <div class="">
+      <span
+        ><q-btn
+          icon="remove_red_eye"
+          label="preview"
+          color="primary"
+          class="q-mr-sm"
+          @click="previewMode = true"
+          :disabled="preview"
+          unelevated
+        />
+        <q-tooltip style="overflow: hidden" v-if="preview">
+          <strong v-if="enquete.vragen">Sla eerst je wijzigingen op</strong>
+          <strong v-else>Voeg eerst een vraag toe.</strong>
         </q-tooltip>
       </span>
       <span>
-      <q-btn
-        label="Opslaan"
-        color="secondary"
-        icon="save"
-        :disabled="save"
-        @click="saveEnquete"
-        unelevated
-      />
-        <q-tooltip style="overflow:hidden;" v-if="save">
-          <strong>Geen wijzigingen</strong> 
+        <q-btn
+          label="Opslaan"
+          color="secondary"
+          icon="save"
+          :disabled="save"
+          @click="saveEnquete"
+          unelevated
+        />
+        <q-tooltip style="overflow: hidden" v-if="save">
+          <strong>Geen wijzigingen</strong>
         </q-tooltip>
       </span>
-      </div>
-    </q-toolbar>
-  
-    <q-tab-panels animated v-model="activeTab" style="width:100%;" class="" keep-alive>
-      
-      <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
-        <q-card flat>
-          <q-card-section style="height:100%;">
-            <component :is="stap.content" @updateEvent="updateEvent($event)"/>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
-      
-      
-    </q-tab-panels>
-    <q-page-sticky
-      position="bottom"
-      :offset="[0, 0]"
-      class="flex flex-end q-pa-md rounded"
-    >
-    </q-page-sticky>
+    </div>
+  </q-toolbar>
+
+  <q-tab-panels
+    animated
+    v-model="activeTab"
+    style="width: 100%"
+    class=""
+    keep-alive
+  >
+    <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
+      <q-card flat>
+        <q-card-section style="height: 100%">
+          <component :is="stap.content" @updateEvent="updateEvent($event)" />
+        </q-card-section>
+      </q-card>
+    </q-tab-panel>
+  </q-tab-panels>
+  <q-page-sticky
+    position="bottom"
+    :offset="[0, 0]"
+    class="flex flex-end q-pa-md rounded"
+  >
+  </q-page-sticky>
 
   <!-- preview popup -->
 
@@ -75,6 +79,7 @@
 </template>
 
 <script>
+import { api } from "boot/axios";
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import enqueteComp from "src/components/enquete_components/enqueteComp.vue";
@@ -94,8 +99,9 @@ export default defineComponent({
   },
   data() {
     return {
-      preview:true,
-      save:true,
+      id: null,
+      preview: true,
+      save: true,
       activeTab: "Instellingen",
       previewMode: false,
       step: 1,
@@ -117,33 +123,56 @@ export default defineComponent({
     };
   },
   methods: {
-    updateEvent(e){
-      this.enquete.vragen = e;
+    updateEvent(e) {
+      if(e.cat === 'instellingen'){
+        this.enquete.settings = e.val;
+      }
+      if(e.cat === 'stijl'){
+        this.enquete.stijl = e.val;
+      }
+      else{
+        this.enquete.vragen = e.val;
+      }
+      
       this.save = false;
     },
-    saveEnquete(){
-     
-       // Opslaan in DB 
-      this.save = true;
-      this.$q.notify(
-        {
-          message:'Wijzigingen opgeslagen',
-          icon:'check',
-          color:'secondary'
-        }
-      )
+    saveEnquete() {
+      // Opslaan in DB
       
+      var data = {
+        name: this.enquete.settings.name,
+        slug: this.enquete.settings.name.replaceAll(' ', '-'),
+        status: String(this.enquete.settings.status),
+        completedDescription: this.enquete.settings.completedDescription,
+        options: [],
+        client:this.enquete.settings.completedDescription,
+      }
+
+      if (!this.id) {
+        api.post("/surveys", data);
+      }
+
+      this.save = true;
+      this.$q.notify({
+        message: "Wijzigingen opgeslagen",
+        icon: "check",
+        color: "secondary",
+      });
     },
   },
-  watch:{
-    save(){
-      if(this.save === false || this.enquete.vragen === null || !this.enquete.vragen || this.enquete.vragen.length < 1) {
+  watch: {
+    save() {
+      if (
+        this.save === false ||
+        this.enquete.vragen === null ||
+        !this.enquete.vragen ||
+        this.enquete.vragen.length < 1
+      ) {
         this.preview = true;
-      }           
-      else{
+      } else {
         this.preview = false;
       }
-    }
-  }
+    },
+  },
 });
 </script>
