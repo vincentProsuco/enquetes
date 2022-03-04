@@ -1,4 +1,5 @@
 <template>
+<q-card-section>
   <q-list>
     <q-input outlined label="Naam" v-model="klant.naam" class="q-mb-sm" />
     <q-input
@@ -20,7 +21,7 @@
       outlined
       label="Logo"
       v-model="klant.logo"
-      type="file"
+      type="file" 
       class="q-mb-sm"
     >
       <template v-slot:prepend>
@@ -35,20 +36,53 @@
     </div>
     
   </q-list>
+</q-card-section>
+<q-card-actions class="flex justify-end">
+        <q-btn
+          icon="save"
+          flat
+          label="Opslaan"
+          color="secondary"
+          @click="save"
+        />
+       
+      </q-card-actions>
 </template>
 
 <script>
+import { api } from 'boot/axios'
 export default {
   props:['klantEdit'],
+  emits:['form-send'],
   data() {
     return {
       klant: { 
-        naam: this.klantEdit.klant,
-        website: this.klantEdit.website,
+        naam: this.klantEdit.name,
+        website: this.klantEdit.websiteUrl,
         email: this.klantEdit.email,
         logo: this.klantEdit.logo},
     };
   },
+  methods:{
+    save(){
+      var data = {
+        name: this.klant.naam,
+        slug: this.klant.naam.replaceAll(' ', '-'),
+        websiteUrl: this.klant.website,
+        email: this.klant.email,
+      }
+      if(this.klantEdit){
+        api.put(`/clients/${this.klantEdit.id}`, data).then(response =>{
+        this.$emit('form-send', 'Klant bijgewerkt.')
+      })
+      }
+      else{
+      api.post('/clients', data).then(response =>{
+        this.$emit('form-send', 'Klant toegevoegd!')
+      })
+      }
+      }
+  }
 };
 </script>
 
