@@ -10,8 +10,8 @@
           </div>
         <div class="form q-mt-xl">
           <q-form>
-            <q-input type ="email" label="Gebruikersnaam"/>
-             <q-input v-model="password" :type="isPwd ? 'password' : 'text'" label="Wachtwoord">
+            <q-input type ="email" label="Gebruikersnaam" v-model="username"/>
+             <q-input :type="isPwd ? 'password' : 'text'" label="Wachtwoord" v-model="password">
         <template v-slot:append>
           <q-icon
             :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -41,6 +41,8 @@ export default {
   
     data(){
         return{
+          username:'',
+          password:'',
           loading:false,
             login:true,
             isPwd:true,
@@ -50,6 +52,7 @@ export default {
       inloggen(){
         this.loading=true
         // Inloggen
+        this.$store.dispatch('user/login', this.username, this.password)
         setTimeout(() => {
           this.loading =false
           this.$router.push('/')

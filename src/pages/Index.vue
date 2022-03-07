@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-px-md">
     <span>
-      <h5>👋 {{begroeting}} Prosuco!</h5>
+      <h5>👋 {{begroeting}} {{user.username}}!</h5>
     </span>
     <div class="row q-col-gutter-x-lg">
       <div class="col-3">
@@ -92,6 +92,7 @@ export default defineComponent({
   },
   data() {
     return {
+      user:this.$store.state.user.user,
       dialog:false,
       begroeting:'Hoi',
       overzicht: {

@@ -2,6 +2,7 @@ import { store } from 'quasar/wrappers'
 import { createStore } from 'vuex'
 import googlefonts from './googlefonts'
 import toolbar from './toolbar'
+import user from './user'
 
 
 // import example from './module-example'
@@ -19,7 +20,8 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       googlefonts,
-      toolbar
+      toolbar,
+      user
     },
 
     // enable strict mode (adds overhead!)

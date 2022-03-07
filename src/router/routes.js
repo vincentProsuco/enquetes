@@ -1,12 +1,13 @@
-
 const routes = [
   {
     path: '/login',
+    meta: { requiresAuth: false },
     component: () => import('layouts/login.vue'),
   },
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'instellingen', component: () => import('pages/instellingen.vue') }
@@ -15,6 +16,7 @@ const routes = [
   {
     path: '/klanten',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       { path: '', component: () => import('pages/klanten.vue') },
     ]
