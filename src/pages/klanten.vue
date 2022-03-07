@@ -18,34 +18,23 @@
           <template v-slot:body-cell-akties="props">
             <q-td :props="props">
               <q-btn
-                size="xs"
+                size="sm"
                 round
                 flat
-                icon="delete"
+                icon="o_delete"
                 @click="deleteKlant(props.row)"
               />
               <q-btn
-                size="xs"
+                size="sm"
                 round
                 flat
-                icon="edit"
+                icon="o_edit"
                 @click="editKlant(props.row.id)"
               />
             </q-td>
           </template>
 
-          <template v-slot:body-cell-campagnes="props">
-            <q-td :props="props">
-              <q-badge
-                v-if="props.value > 0"
-                color="green"
-                :label="props.value"
-              />
-              <q-badge v-else color="orange" :label="props.value" />
-            </q-td>
-          </template>
-
-          <template v-slot:top-right>
+        <template v-slot:top-right>
             <q-input
               outlined
               v-model="filter"
@@ -62,14 +51,14 @@
             <q-btn
               label="Klant toevoegen"
               color="secondary"
-              icon="add_business"
+              icon="o_add_business"
               @click="(dialog = true), (editable = null)"
             />
           </template>
 
           <template v-slot:no-data="{ message }">
             <div class="full-width row flex-center text-accent q-gutter-sm">
-              <q-icon size="2em" name="error_outline" />
+              <q-icon size="2em" name="o_error" />
               <span>
                 {{ message }}
               </span>
@@ -92,7 +81,7 @@
         <span class="text-h6" v-else>{{ selectedKlant.name }} bewerken</span>
         <q-icon
           class="clickable"
-          name="close"
+          name="o_close"
           flat
           color="secondary"
           size="xs"
@@ -119,6 +108,9 @@ export default defineComponent({
   mounted() {
     this.forceRerender()
     this.$q.loadingBar.stop();
+    if(window.location.hash.substr(window.location.hash.length - 3) === 'new'){
+      this.dialog=true
+    }
   },
   data() {
     return {
