@@ -62,7 +62,7 @@ export default {
         { naam: "Dashboard", link: "/", icon: "o_space_dashboard", activeIcon:'space_dashboard', isActive:true, url: "/" },
         { naam: "Klanten", link: "/", icon: "o_store", activeIcon:'store', isActive:false, url: "/klanten" },
         { naam: "Enquetes", link: "/", icon: "o_ballot", activeIcon:'ballot', isActive:false, url: "/enquetes" },
-        { naam: "Instellingen", link: "/", icon: "o_tune", activeIcon:'tune', isActive:false, url: "/instellingen" },
+        // { naam: "Instellingen", link: "/", icon: "o_tune", activeIcon:'tune', isActive:false, url: "/instellingen" },
       ],
     };
   },

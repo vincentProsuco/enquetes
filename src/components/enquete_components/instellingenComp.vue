@@ -45,6 +45,7 @@
                   v-model="settings.completedDescription"
                   min-height="8rem"
                   class="q-mt-md"
+                  :toolbar="toolbar"
                 />
               </q-item-section>
             </q-item>
@@ -57,10 +58,12 @@
 
 <script>
 import { api } from "boot/axios";
+
 export default {
   props: ["save"],
   data() {
     return {
+      toolbar:this.$store.state.toolbar.toolbar,
       clients: [],
       settings: {
         client: "",

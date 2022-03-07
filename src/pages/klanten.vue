@@ -12,6 +12,7 @@
           rows-per-page-label="Rijen per pagina"
           flat
           class="bg-grey-3"
+          :loading="loading"
           
         >
           <template v-slot:body-cell-akties="props">
@@ -121,6 +122,7 @@ export default defineComponent({
   },
   data() {
     return {
+      loading:true,
       componentKey: 0,
       editable: null,
       dialog: false,
@@ -161,6 +163,7 @@ export default defineComponent({
       api.get('/clients').then(response => {
       this.rows=response.data
     })
+    this.loading = false
     },
     klantAdded(m){
       this.dialog=false;
@@ -174,7 +177,7 @@ export default defineComponent({
       this.$q
         .dialog({
           title: `${klant.name} verwijderen?`,
-          message: `Typ <b>${klant.name}</b> om te bevestigen. `,
+          message: `Typ <b>${klant.name}</b> om te bevestigen. <br> Let op: Deze aktie kan niet meer ongedaan gemaakt worden!  `,
           prompt: {
             model: "",
             isValid: (data) => data === klant.name,

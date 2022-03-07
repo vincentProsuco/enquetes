@@ -109,11 +109,11 @@ export default defineComponent({
         {
           nr: 1,
           titel: "Instellingen",
-          icon: "tune",
+          icon: "o_tune",
           content: "instellingenComp",
         },
-        { nr: 2, titel: "Stijl", icon: "palette", content: "stijlComp" },
-        { nr: 3, titel: "Enquête", icon: "poll", content: "enqueteComp" },
+        { nr: 2, titel: "Stijl", icon: "o_palette", content: "stijlComp" },
+        { nr: 3, titel: "Enquête", icon: "o_poll", content: "enqueteComp" },
       ],
       enquete: {
         settings: null,
@@ -124,40 +124,51 @@ export default defineComponent({
   },
   methods: {
     updateEvent(e) {
-      if(e.cat === 'instellingen'){
+      if (e.cat === "instellingen") {
         this.enquete.settings = e.val;
       }
-      if(e.cat === 'stijl'){
+      if (e.cat === "stijl") {
         this.enquete.stijl = e.val;
       }
-      else{
+      if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
       }
-      
+
       this.save = false;
     },
     saveEnquete() {
       // Opslaan in DB
-      
+
       var data = {
         name: this.enquete.settings.name,
-        slug: this.enquete.settings.name.replaceAll(' ', '-'),
+        slug: this.enquete.settings.name.replaceAll(" ", "-"),
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         options: [],
-        client:this.enquete.settings.completedDescription,
-      }
+        client: this.enquete.settings.completedDescription,
+      };
 
       if (!this.id) {
-        api.post("/surveys", data);
+        api.post("/surveys", data).catch((error) => {
+          if (error.response) {
+            console.log(error.response.data.detail)
+            this.$q.notify({
+              message: "Oeps.. Er ging iets fout!",
+              icon: "sentiment_very_dissatisfied",
+              color: "negative",
+              timeout: 5000,
+            });
+          } else {
+            this.save = true;
+            this.$q.notify({
+              message: "Wijzigingen opgeslagen",
+              icon: "check",
+              color: "secondary",
+              
+            });
+          }
+        });
       }
-
-      this.save = true;
-      this.$q.notify({
-        message: "Wijzigingen opgeslagen",
-        icon: "check",
-        color: "secondary",
-      });
     },
   },
   watch: {

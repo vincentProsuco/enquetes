@@ -11,7 +11,6 @@
         input-debounce="0"
         label="Lettertype"
         :options="rows"
-        
         behavior="dialog"
         outlined
 
@@ -123,13 +122,12 @@ export default {
       stijl: {
       deep: true,
       handler(){
-        this.$emit('updateEvent', this.items)
+        this.$emit('updateEvent', {val:this.items, cat:'stijl'})
       }
         }
   },
   methods:{
       filterFn (val, update) {
-         console.log(val)
         if (val === '') {
           update(() => {
             options.value = this.stringOptions

@@ -1,13 +1,14 @@
 <template>
 <q-card-section>
   <q-list>
-    <q-input outlined label="Naam" v-model="klant.naam" class="q-mb-sm" />
+    <q-input outlined label="Naam" v-model="klant.naam" class="q-mb-sm" :rules="rules.naam"/>
     <q-input
       outlined
       label="Website"
       v-model="klant.website"
       type="url"
       class="q-mb-sm"
+      :rules="rules.url"
     />
     <q-input
       outlined
@@ -15,6 +16,7 @@
       v-model="klant.email"
       type="email"
       class="q-mb-sm"
+      :rules="rules.email"
     />
     <q-file
     v-if="!klant.logo"
@@ -56,14 +58,23 @@ export default {
   emits:['form-send'],
   data() {
     return {
+      rules:{
+        naam:[val => !!val || 'Naam is verplicht!', val => val != ' ' || 'Minimaal 1 teken!'],
+        email:[val => !!val || 'Email is verplicht!', val => val.length > 4 || 'Minimaal 5 tekens!', val => val.includes('.') || 'Geen geldig emailadres!', val => val.includes('@') || 'Geen geldig emailadres!'],
+        url:[val => !!val || 'Website is verplicht!', val => val.length > 4 || 'Minimaal 5 tekens!', val => val.includes('.') || 'Geen geldige URL!', val => val.includes('https://', 'http://') || 'Geen geldige URL!']
+      },
       klant: { 
         naam: this.klantEdit.name,
         website: this.klantEdit.websiteUrl,
         email: this.klantEdit.email,
-        logo: this.klantEdit.logo},
+        logo: this.klantEdit.logo
+        },
     };
   },
   methods:{
+    validate(val){
+
+    },
     save(){
       var data = {
         name: this.klant.naam,

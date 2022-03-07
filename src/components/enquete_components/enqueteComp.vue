@@ -192,7 +192,7 @@ export default {
     items: {
       deep: true,
       handler() {
-        this.$emit("updateEvent", this.items);
+        this.$emit("updateEvent", {val:this.items, cat:'vragen'});
       },
     },
   },
