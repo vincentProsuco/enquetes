@@ -138,15 +138,19 @@ export default defineComponent({
     },
     saveEnquete() {
       // Opslaan in DB
-
+      // api.get(`/clients/${this.enquete.settings.client.value}`).then(response => {
+      //   selectedClient = response.data
+      // })
+      console.log(this.enquete.settings.client.value)
       var data = {
-        name: this.enquete.settings.name,
-        slug: this.enquete.settings.name.replaceAll(" ", "-"),
+        name: this.enquete.settings.naam,
+        slug: this.enquete.settings.naam.replaceAll(" ", "-"),
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         options: [],
-        client: this.enquete.settings.completedDescription,
       };
+      
+      
 
       if (!this.id) {
         api.post("/surveys", data).catch((error) => {
@@ -158,16 +162,17 @@ export default defineComponent({
               color: "negative",
               timeout: 5000,
             });
-          } else {
+          }})
+          .then(response =>{
             this.save = true;
             this.$q.notify({
               message: "Wijzigingen opgeslagen",
               icon: "check",
               color: "secondary",
               
-            });
-          }
-        });
+            })
+          })
+       
       }
     },
   },

@@ -28,15 +28,15 @@
 
           <template v-slot:body-cell-resultaten="props">
             <td>   
-            <q-btn size="xs" flat icon="poll" color="grey-8" round :to="'/results/'+props.value"/>      
+            <q-btn size="xs" flat icon="o_poll" color="grey-8" round :to="'/results/'+props.value"/>      
             </td>
           </template>
 
           <template v-slot:body-cell-status="props">
             <td>
-            <q-chip square v-if="props.value === 'Actief'" :label="props.value" icon="check" text-color="white" color="green-4" size="sm"/>
-            <q-chip square v-if="props.value === 'Gepauzeerd'" :label="props.value" icon="pause" text-color="white" color="orange-4" size="sm"/>
-            <q-chip square v-if="props.value === 'Beëindigd'" :label="props.value" icon="stop" text-color="white" color="red-4" size="sm"/>
+            <q-chip square v-if="props.value === 'true'" label="Aktief" icon="check" text-color="white" color="green-4" size="sm"/>
+            <q-chip square v-if="props.value === 'null'" label="Gepauzeerd" icon="pause" text-color="white" color="orange-4" size="sm"/>
+            <q-chip square v-if="props.value === 'false'" label="Beëindigd" icon="stop" text-color="white" color="red-4" size="sm"/>
             </td>
           </template>
 
@@ -75,6 +75,7 @@
 <script>
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
+import { api } from 'boot/axios'
 
 export default defineComponent({
   name: "PageIndex",
@@ -84,6 +85,12 @@ export default defineComponent({
   },
   mounted() {
     this.$q.loadingBar.stop();
+    api.get('/surveys').then(response =>{
+      for(var x = 0; x < response.data.length; x++){
+        console.log(response.data[x])
+      this.rows.push({campagne:response.data[x].name, klant: "ntb", status: response.data[x].status, permalink:response.data[x].slug})
+      }
+    })
   },
   data() {
     return {
@@ -125,11 +132,7 @@ export default defineComponent({
           align: "left",
         },
       ],
-      rows: [
-        {campagne:'Enquete Horeca', klant: "Oostappen vakantieparken", status: "Actief", permalink:'BA6nugy8dPfcPqdn' },
-        {campagne:'Vragenlijst Boekingsproces', klant: "De Barkhoorn", status: "Gepauzeerd", permalink:'u9AEZKsRc303o9pO' },
-        {campagne:'Klanttevredenheidsonderzoek', klant: "Hoge Hexel", status: "Beëindigd", permalink:'XTHF41A4WXMV9XDI' },
-      ],
+      rows: [],
     };
   },
   methods:{
