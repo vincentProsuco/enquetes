@@ -26,7 +26,8 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/enquetes.vue') },
-      { path: 'new', component: () => import('pages/nieuweEnquete.vue') }
+      { path: 'new', component: () => import('pages/nieuweEnquete.vue') },
+      { path: 'edit/:id', component: () => import('pages/nieuweEnquete.vue') }
     ]
   },
   {

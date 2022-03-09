@@ -146,6 +146,7 @@ import Rating from "../vragen/rating.vue";
 import TussenPagina from "../vragen/tussenPagina.vue";
 export default {
   emits: ["updateEvent"],
+  props:["editData"],
   components: {
     draggable,
     MeerKeuze,

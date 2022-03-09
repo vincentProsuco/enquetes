@@ -51,17 +51,15 @@
     <q-tab-panel :name="stap.titel" v-for="stap in stappen" :key="stap">
       <q-card flat>
         <q-card-section style="height: 100%">
-          <component :is="stap.content" @updateEvent="updateEvent($event)" />
+          <component
+            :is="stap.content"
+            @updateEvent="updateEvent($event)"
+            :editData="editData"
+          />
         </q-card-section>
       </q-card>
     </q-tab-panel>
   </q-tab-panels>
-  <q-page-sticky
-    position="bottom"
-    :offset="[0, 0]"
-    class="flex flex-end q-pa-md rounded"
-  >
-  </q-page-sticky>
 
   <!-- preview popup -->
 
@@ -96,9 +94,16 @@ export default defineComponent({
   },
   mounted() {
     this.$q.loadingBar.stop();
+    if (this.$route.params.id) {
+      this.id = this.$route.params.id;
+      api.get(`/surveys/${this.id}`).then((response) => {
+        this.editData = response.data;
+      });
+    }
   },
   data() {
     return {
+      editData: null,
       id: null,
       preview: true,
       save: true,
@@ -137,42 +142,74 @@ export default defineComponent({
       this.save = false;
     },
     saveEnquete() {
-      // Opslaan in DB
-      // api.get(`/clients/${this.enquete.settings.client.value}`).then(response => {
-      //   selectedClient = response.data
-      // })
-      console.log(this.enquete.settings.client.value)
-      var data = {
-        name: this.enquete.settings.naam,
-        slug: this.enquete.settings.naam.replaceAll(" ", "-"),
+      var settingsData = {
+        name: this.enquete.settings.name,
+        slug: this.enquete.settings.name.replaceAll(" ", "-"),
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         options: [],
+        client: `api/clients/${this.enquete.settings.client.value.id}`,
       };
-      
-      
 
-      if (!this.id) {
-        api.post("/surveys", data).catch((error) => {
-          if (error.response) {
-            console.log(error.response.data.detail)
+      if (this.id === null) {
+        api
+          .post("/surveys", settingsData)
+          .catch((error) => {
+            if (error.response) {
+              console.log(error.response.data.detail);
+              this.$q.notify({
+                message: "Oeps.. Er ging iets fout!",
+                icon: "sentiment_very_dissatisfied",
+                color: "negative",
+                timeout: 5000,
+              });
+            }
+          })
+          .then((response) => {
+            this.save = true;
+            this.id = response.data.id;
+            console.log(response.data.id)
             this.$q.notify({
-              message: "Oeps.. Er ging iets fout!",
-              icon: "sentiment_very_dissatisfied",
-              color: "negative",
-              timeout: 5000,
+              message: "Enquête opgeslagen",
+              icon: "check",
+              color: "secondary",
             });
-          }})
-          .then(response =>{
+          });
+    
+        for(var v =0; v < this.enquete.vragen.length; v++){
+          var questionData = {
+          title: this.enquete.vragen[v].waarde.vraag,
+          slug: "string",
+          options: ["string"],
+          survey: `api/surveys/${this.id}`,
+        }
+        api.post("survey_questions", questionData).then((response) => {
+          console.log(response);
+        });
+        }
+        
+      } else {
+        api
+          .put(`/surveys/${this.id}`, data)
+          .catch((error) => {
+            if (error.response) {
+              console.log(error.response.data.detail);
+              this.$q.notify({
+                message: "Oeps.. Er ging iets fout!",
+                icon: "sentiment_very_dissatisfied",
+                color: "negative",
+                timeout: 5000,
+              });
+            }
+          })
+          .then((response) => {
             this.save = true;
             this.$q.notify({
               message: "Wijzigingen opgeslagen",
               icon: "check",
               color: "secondary",
-              
-            })
-          })
-       
+            });
+          });
       }
     },
   },

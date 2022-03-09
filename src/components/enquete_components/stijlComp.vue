@@ -93,7 +93,7 @@ import { useStore } from 'vuex'
 import { ref } from 'vue'
 
 export default {
-  props:['save'],
+  props:['save', 'editData'],
   setup(){
     var $store = useStore()
     $store.dispatch('googlefonts/getFonts') 

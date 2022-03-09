@@ -14,7 +14,7 @@
             type="text"
             class="q-my-md"
             outlined
-            v-model="settings.naam"
+            v-model="settings.name"
             label="Naam Enquête"
             dense
           />
@@ -60,24 +60,32 @@
 import { api } from "boot/axios";
 
 export default {
-  props: ["save"],
+  props: ["save", "editData"],
+  emits: ["updateEvent"],
   data() {
     return {
-      toolbar:this.$store.state.toolbar.toolbar,
-      clients: [],
-      settings: {
+      settings:{
         client: "",
         name: "",
         status: null,
         completedDescription: "Hartelijk dank voor uw deelname.",
       },
+      toolbar: this.$store.state.toolbar.toolbar,
+      clients: [],
     };
   },
   watch: {
+    editData(val){
+      this.settings.client = {label:this.editData.client.name, value:this.editData.client};
+      this.settings.name = this.editData.name
+      this.settings.status = this.editData.status
+      this.settings.completedDescription = this.editData.completedDescription
+      
+    },
     settings: {
       deep: true,
       handler() {
-        this.$emit("updateEvent", {cat:'instellingen', val:this.settings});
+        this.$emit("updateEvent", { cat: "instellingen", val: this.settings });
       },
     },
   },
