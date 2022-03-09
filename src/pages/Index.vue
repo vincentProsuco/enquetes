@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-px-md">
     <span>
-      <h5>👋 {{begroeting}} {{user.username}}!</h5>
+      <h5>👋 {{begroeting}} <span v-if="user">{{user.username}}</span>!</h5>
     </span>
     <div class="row q-col-gutter-x-lg">
       <div class="col-3">
@@ -89,6 +89,21 @@ export default defineComponent({
       .then((response) => {
         this.overzicht.klanten = response.data.length;
       });
+    api.get('/surveys').then(response=>{
+      for (var s = 0; s < response.data.length; s++){
+        if(response.data[s].status = 'null'){
+          this.overzicht.enquetes.gepauzeerd++
+        }
+        else if(response.data[s].status = 'false'){
+          this.overzicht.enquetes.klaar++
+        }
+        else if(response.data[s].status = 'true'){
+          this.overzicht.enquetes.actief++
+        }
+       
+      }
+      
+    })
   },
   data() {
     return {

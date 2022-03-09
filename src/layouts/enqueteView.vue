@@ -1,78 +1,100 @@
 <template>
- <q-layout view="hHh lpR fFf">
-    <q-page-container class="q-pa-md">
-        <q-ribbon class="q-pb-md" position="right" leaf-position="top" decoration="rounded-in" inline glow>Inline Right Ribbon</q-ribbon>
-      <div class="row q-mt-xl">
-          <div class="col flex flex-center">
-              <q-img :src="logo" style="max-width:150px"/>
-          </div>
+  <q-layout view="hHh LpR fFf">
+    <q-page-container class="box">
+      <div class="flex flex-center">
+        <img :src="require('assets/prosucoLogo.png')" style="max-height:5rem;">
       </div>
-
-      <div class="row flex flex-center">
-        <div class="col flex flex-center">
-           <span v-html="vraag" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col flex justify-center">
-            <q-input
-        v-model="antwoord"
-        filled
-        clearable
-        type="textarea"
-        color="teal"
-        label="Uw antwoord"
-        class="shadow-1"
-        style="width:350px;"  
-      />
-        </div>
-    </div>
-
+      <q-tab-panels v-model="tab" animated>
+        <q-tab-panel
+          :name="index"
+          v-for="(question, index) in survey"
+          :key="index"
+        >
+          <div class="text-h6 flex flex-center">
+          <span v-html="question.title"></span>
+          </div>
+        </q-tab-panel>
+        <q-tab-panel
+        name="finnish">
+         <div class="text-h6 flex flex-center">
+         <span v-html="eindtext"></span>
+         </div>
+        </q-tab-panel>
+      </q-tab-panels>
     </q-page-container>
 
-    <q-footer class="bg-grey-2 text-white flex flex-center q-pa-md">
-      <div class="controls">
-    <q-btn icon="navigate_before" id="vorige_vraag" flat rounded text-color="grey-9">
-        <span v-if="!mobile">
-            Vorige Vraag
-        </span>
-    </q-btn>
-    <q-chip icon="question_answer">3/6</q-chip>
-    <q-btn icon-right="navigate_next" id="volgende_vraag" flat rounded text-color="grey-9">
-        <span v-if="!mobile">
-            Volgende vraag
-        </span>
-    </q-btn>
-    </div>
+    <q-footer class="bg-grey-3 text-white">
+      <q-toolbar class="flex flex-center" v-if="tab != 'finnish'">
+        <q-tabs
+          v-model="tab"
+          class="text-grey-10"
+          active-color="primary"
+          indicator-color="grey-10"
+          narrow-indicator
+        >
+          <q-btn @click.prevent="tab--" label="Vorige" unelevated v-if="tab != 0  && tab != 'finnish'" />
+          <q-btn @click.prevent="tab++" label="Volgende" unelevated v-if="tab != survey.length-1 && tab != 'finnish'" class="q-mx-md"/>
+          <q-btn @click.prevent="postSurvey" label="Versturen" color="primary" unelevated size="md" class="q-mx-md" v-else/>
+        </q-tabs>
+      </q-toolbar>
     </q-footer>
-
   </q-layout>
 </template>
-
 <script>
-import { useQuasar } from 'quasar'
+import { api } from "boot/axios";
+import { useQuasar } from "quasar"
 export default {
-    setup(){
-        const $q = useQuasar()    
+  setup(){
+    var $q = useQuasar()
+  },
+  mounted() {
+    var id = this.$route.hash.substring(1, this.$route.hash.legth);
+    api.get(`/surveys/${id}`).then((response) => {
+      this.survey = response.data.questions;
+      this.nmQuestions = response.data.questions.length
+      this.eindtext = response.data.completedDescription
+    });
+  },
+  data() {
+    return {
+      eindtext:null,
+      tab: 0,
+      nmQuestions:0,
+      activeQuestion: 0,
+      survey: 0,
+    };
+  },
+  methods: {
+    postSurvey(){
+      this.$q.loading.show()
+      setTimeout(() => {
+      this.$q.loading.hide()  
+      }, 1500);
+      this.tab = 'finnish'
     },
-    computed:{
-        id(){
-            return this.$route.params.id
-        },
-        mobile(){
-            if(this.$q.platform.is.mobile){
-                return true
-                }
-            else{return false}
+    active(i) {
+      if (this.activeQuestion === i) {
+        return true;
+      }
     },
-    },
-    data(){
-        return{
-            vraag:'<h6><b>Lorem ipsum, dolor sit amet consectetur adipisicing elit?</b></h6>',
-            logo:'https://www.barkhoorn.nl/images/footer-logo.svg',
-            antwoord:'',
-        }
-    }
-}
+  },
+};
 </script>
+
+<style scoped>
+
+.question {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+.box {
+  
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px !important;
+  max-width: 95vw !important;
+  height: 50vh;
+  padding-top:10vh;
+}
+</style>

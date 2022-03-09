@@ -142,6 +142,7 @@ export default defineComponent({
       this.save = false;
     },
     saveEnquete() {
+      this.$q.loading.show();
       var settingsData = {
         name: this.enquete.settings.name,
         slug: this.enquete.settings.name.replaceAll(" ", "-"),
@@ -153,7 +154,7 @@ export default defineComponent({
 
       if (this.id === null) {
         api
-          .post("/surveys", settingsData)
+          .post("/surveys", data)
           .catch((error) => {
             if (error.response) {
               console.log(error.response.data.detail);
@@ -166,34 +167,37 @@ export default defineComponent({
             }
           })
           .then((response) => {
-            this.save = true;
             this.id = response.data.id;
-            console.log(response.data.id)
+
+            for (var v = 0; v < this.enquete.vragen.length; v++) {
+              var questionData = {
+                title: this.enquete.vragen[v].waarde.vraag,
+                slug: this.enquete.vragen[v].waarde.vraag.replaceAll(' ', '-'),
+                options: this.enquete.vragen[v].waarde.opties,
+                survey: `api/surveys/${response.data.id}`,
+                client: `api/clients/${this.enquete.settings.client.value.id}`
+              };
+              api.post("survey_questions", questionData).then((response) => {
+                console.log(response);
+              });
+            }
+          })
+          .then((response) => {
+            this.save = true;
+            this.$q.loading.hide();
             this.$q.notify({
               message: "Enquête opgeslagen",
               icon: "check",
               color: "secondary",
             });
           });
-    
-        for(var v =0; v < this.enquete.vragen.length; v++){
-          var questionData = {
-          title: this.enquete.vragen[v].waarde.vraag,
-          slug: "string",
-          options: ["string"],
-          survey: `api/surveys/${this.id}`,
-        }
-        api.post("survey_questions", questionData).then((response) => {
-          console.log(response);
-        });
-        }
-        
       } else {
         api
-          .put(`/surveys/${this.id}`, data)
+          .put(`/surveys/${this.id}`, settingsData)
           .catch((error) => {
             if (error.response) {
               console.log(error.response.data.detail);
+              this.$q.loading.hide();
               this.$q.notify({
                 message: "Oeps.. Er ging iets fout!",
                 icon: "sentiment_very_dissatisfied",
@@ -204,6 +208,7 @@ export default defineComponent({
           })
           .then((response) => {
             this.save = true;
+            this.$q.loading.hide();
             this.$q.notify({
               message: "Wijzigingen opgeslagen",
               icon: "check",
@@ -211,6 +216,7 @@ export default defineComponent({
             });
           });
       }
+      
     },
   },
   watch: {

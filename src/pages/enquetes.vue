@@ -32,7 +32,7 @@
                 icon="link"
                 color="grey-8"
                 round
-                @click="copyPermaLink(props.value, props.row.klant)"
+                @click="copyPermaLink(props.value)"
               />
             </td>
           </template>
@@ -187,14 +187,14 @@ export default defineComponent({
           name: "resultaten",
           label: "Resultaten",
           sortable: false,
-          field: (row) => row.permalink,
+          field: (row) => row.klant + '#' + row.id ,
           align: "left",
         },
         {
           name: "permalink",
           label: "Link",
           sortable: false,
-          field: (row) => row.permalink,
+          field: (row) => row.klant + '#' + row.id ,
           align: "left",
         },
         {
@@ -246,9 +246,10 @@ export default defineComponent({
     this.refreshKey++  
     },
 
-    copyPermaLink(e, k) {
-      var klant = k.replaceAll(" ", "-").toLowerCase();
-      var link = window.location.origin + "/#/enquete/" + klant + "/" + e;
+    copyPermaLink(e) {
+      var slug = "/#/enquete/" + e.replaceAll(' ', '-').toLowerCase() 
+      
+      var link = window.location.origin + slug;
       navigator.clipboard.writeText(link);
       this.$q.notify({
         message: "Link gekopieerd",

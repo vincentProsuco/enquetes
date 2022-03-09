@@ -39,7 +39,7 @@ const routes = [
   },
 
   {
-    path: '/enquete/:klant/:id',
+    path: '/enquete/:klant:id',
     component: () => import('layouts/enqueteView.vue'),
     // children: [
     //   { path: '', component: () => import('layouts/enqueteView.vue') },
