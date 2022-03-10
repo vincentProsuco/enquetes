@@ -154,19 +154,9 @@ export default defineComponent({
 
       if (this.id === null) {
         api
-          .post("/surveys", data)
-          .catch((error) => {
-            if (error.response) {
-              console.log(error.response.data.detail);
-              this.$q.notify({
-                message: "Oeps.. Er ging iets fout!",
-                icon: "sentiment_very_dissatisfied",
-                color: "negative",
-                timeout: 5000,
-              });
-            }
-          })
+          .post("/surveys", settingsData)
           .then((response) => {
+
             this.id = response.data.id;
 
             for (var v = 0; v < this.enquete.vragen.length; v++) {
@@ -178,11 +168,11 @@ export default defineComponent({
                 client: `api/clients/${this.enquete.settings.client.value.id}`
               };
               api.post("survey_questions", questionData).then((response) => {
-                console.log(response);
+                console.log(response.data);
               });
             }
           })
-          .then((response) => {
+          .then(() => {
             this.save = true;
             this.$q.loading.hide();
             this.$q.notify({
