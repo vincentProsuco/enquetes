@@ -143,6 +143,12 @@ export default defineComponent({
     },
     saveEnquete() {
       this.$q.loading.show();
+
+      var questionData = []
+
+    
+
+
       var settingsData = {
         name: this.enquete.settings.name,
         slug: this.enquete.settings.name.replaceAll(" ", "-"),
@@ -150,27 +156,23 @@ export default defineComponent({
         completedDescription: this.enquete.settings.completedDescription,
         options: [],
         client: `api/clients/${this.enquete.settings.client.value.id}`,
+        questions:questionData
       };
+      
 
       if (this.id === null) {
         api
           .post("/surveys", settingsData)
           .then((response) => {
-
-            this.id = response.data.id;
-
+            this.id = response.data.id    
             for (var v = 0; v < this.enquete.vragen.length; v++) {
-              var questionData = {
+             questionData.push({
                 title: this.enquete.vragen[v].waarde.vraag,
                 slug: this.enquete.vragen[v].waarde.vraag.replaceAll(' ', '-'),
                 options: this.enquete.vragen[v].waarde.opties,
                 survey: `api/surveys/${response.data.id}`,
                 client: `api/clients/${this.enquete.settings.client.value.id}`
-              };
-              api.post("survey_questions", questionData).then((response) => {
-                console.log(response.data);
-              });
-            }
+              })}   
           })
           .then(() => {
             this.save = true;
