@@ -92,32 +92,32 @@
                     <meer-keuze
                       v-if="element.type === 'Meerkeuze'"
                       :q="element.id"
-                      @delete-item="deleteItem($event)"
+                      @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <selecteren
                       v-if="element.type === 'Selecteren'"
                       :q="element.id"
-                      @delete-item="deleteItem($event)"
+                      @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <open-vraag
                       v-if="element.type === 'Open vraag'"
                       :q="element.id"
                       :edit="element.waarde"
-                      @delete-item="deleteItem($event)"
+                      @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <rating
                       v-if="element.type === 'Rating'"
                       :q="element.id"
-                      @delete-item="deleteItem($event)"
+                      @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <tussen-pagina
                       v-if="element.type === 'Tussen pagina'"
                       :q="element.id"
-                      @delete-item="deleteItem($event)"
+                      @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                   </q-card>
@@ -250,8 +250,9 @@ export default {
       this.ids++;
     },
     deleteItem(e) {
+      api.delete(`survey_questions/${e.surveyQuestionId}`)
       for (var i = 0; i < this.items.length; i++) {
-        if (this.items[i].id === e) {
+        if (this.items[i].id === e.id) {
           this.items.splice(i, 1);
           this.ids = this.ids - 1;
         }
