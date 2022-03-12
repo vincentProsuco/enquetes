@@ -1,13 +1,27 @@
 <template>
   <q-toolbar class="bg-primary flex justify-between">
-    <q-tabs class="text-grey-2" v-model="activeTab" inline-label>
+    <q-tabs class="text-grey-2" inline-label>
       <q-tab
-        :name="stap.titel"
-        :icon="stap.icon"
-        :label="stap.titel"
-        v-for="stap in stappen"
-        :key="stap"
+        name="instellingenComp"
+        icon="o_poll"
+        label="Instellingen"
+        @click="activeTab = 'Instellingen'"
       />
+      <q-tab
+        name="stijlComp"
+        icon="o_palette"
+        label="Stijl"
+        @click="activeTab = 'Stijl'"
+        :disable="id === null"
+      />
+      <q-tab
+        name="enqueteComp"
+        icon="o_poll"
+        label="Enquête"
+        @click="activeTab = 'Enquête'"
+        :disable="id === null"
+      />
+      {{ questionId }}
     </q-tabs>
     <div class="">
       <span
@@ -98,11 +112,23 @@ export default defineComponent({
       this.id = this.$route.params.id;
       api.get(`/surveys/${this.id}`).then((response) => {
         this.editData = response.data;
+
+        if (!this.enquete.vragen) {
+          this.enquete.vragen = response.data.questions;
+          this.enquete.vragen.sort(function (a, b) {
+            return a.options[0].id - b.options[0].id;
+          });
+        } else {
+          for (var i = 0; i < response.data.questions.length; i++) {
+            this.enquete.vragen.push(response.data.questions[i]);
+          }
+        }
       });
     }
   },
   data() {
     return {
+      questionId:null,
       editData: null,
       id: null,
       preview: true,
@@ -137,6 +163,12 @@ export default defineComponent({
       }
       if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
+        for(var i = 0; i<this.enquete.vragen.length; i++){
+          this.enquete.vragen[i].id=i
+          this.enquete.vragen[i].waarde.id=i
+        }
+      
+        
       }
 
       this.save = false;
@@ -144,71 +176,69 @@ export default defineComponent({
     saveEnquete() {
       this.$q.loading.show();
 
-      var questionData = []
-
-    
-
-
       var settingsData = {
         name: this.enquete.settings.name,
         slug: this.enquete.settings.name.replaceAll(" ", "-"),
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
-        options: [],
         client: `api/clients/${this.enquete.settings.client.value.id}`,
-        questions:questionData
       };
-      
 
       if (this.id === null) {
-        api
+        var apiSettings = api
           .post("/surveys", settingsData)
           .then((response) => {
-            this.id = response.data.id    
-            for (var v = 0; v < this.enquete.vragen.length; v++) {
-             questionData.push({
-                title: this.enquete.vragen[v].waarde.vraag,
-                slug: this.enquete.vragen[v].waarde.vraag.replaceAll(' ', '-'),
-                options: this.enquete.vragen[v].waarde.opties,
-                survey: `api/surveys/${response.data.id}`,
-                client: `api/clients/${this.enquete.settings.client.value.id}`
-              })}   
-          })
-          .then(() => {
-            this.save = true;
-            this.$q.loading.hide();
-            this.$q.notify({
-              message: "Enquête opgeslagen",
-              icon: "check",
-              color: "secondary",
-            });
+            this.id = response.data.id;
           });
       } else {
-        api
-          .put(`/surveys/${this.id}`, settingsData)
-          .catch((error) => {
-            if (error.response) {
-              console.log(error.response.data.detail);
-              this.$q.loading.hide();
-              this.$q.notify({
-                message: "Oeps.. Er ging iets fout!",
-                icon: "sentiment_very_dissatisfied",
-                color: "negative",
-                timeout: 5000,
-              });
-            }
-          })
-          .then((response) => {
-            this.save = true;
-            this.$q.loading.hide();
-            this.$q.notify({
-              message: "Wijzigingen opgeslagen",
-              icon: "check",
-              color: "secondary",
-            });
-          });
+        var apiSettings = api.put(`/surveys/${this.id}`, settingsData);
       }
-      
+
+      apiSettings.then(() => {
+        this.save = true;
+        this.$q.loading.hide();
+        this.$q.notify({
+          message: "Enquête opgeslagen",
+          icon: "check",
+          color: "secondary",
+        });
+      });
+
+      if (this.enquete.vragen) {
+                      
+
+        for (var x = 0; x < this.enquete.vragen.length; x++) {
+          var questionData = {
+            
+            title: this.enquete.vragen[x].waarde.vraag,
+            slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
+            options: [this.enquete.vragen[x].waarde],
+            survey: `api/surveys/${this.id}`,
+          };
+          if (this.enquete.vragen[x].surveyQuestionId == null) {
+            
+            api.post("/survey_questions", questionData).then((response)=>{
+              this.questionId=response.data.id
+              
+            this.enquete.vragen[x-1].surveyQuestionId=this.questionId
+           
+            }).then(()=>{
+              
+            })
+          } else {
+            var questionData = {
+              
+              title: this.enquete.vragen[x].waarde.vraag,
+              slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
+              options: [this.enquete.vragen[x].waarde],
+            };
+            api.put(
+              `/survey_questions/${this.enquete.vragen[x].surveyQuestionId}`,
+              questionData
+            );
+          }
+        }
+      }
     },
   },
   watch: {

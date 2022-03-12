@@ -1,11 +1,23 @@
 <template>
   <q-card class="q-pa-md">
     <q-card-section>
-       <q-toggle v-model="item.verplicht" label="Antwoord verplicht?" dense size="sm" icon="close" checked-icon="check"/>
+      <q-toggle
+        v-model="item.verplicht"
+        label="Antwoord verplicht?"
+        dense
+        size="sm"
+        icon="close"
+        checked-icon="check"
+      />
     </q-card-section>
     <q-card-section>
       <!-- <q-input outlined v-model="item.vraag" label="Vraag" @change="showPreview"/> -->
-      <q-editor v-model="item.vraag" label="Vraag" @change="showPreview" :toolbar="toolbar"/>
+      <q-editor
+        v-model="item.vraag"
+        label="Vraag"
+        @change="showPreview($event)"
+        :toolbar="toolbar"
+      />
     </q-card-section>
     <q-card-actions>
       <q-btn
@@ -22,16 +34,26 @@
 
 <script>
 export default {
-  props: ["q"],
+  props: ["q", "edit"],
   emits: ["vraag-preview", "delete-item"],
   mounted() {
     this.showPreview();
   },
+  computed: {
+    item() {
+      var item;
+      if (this.edit) {
+        item = this.edit;
+      } else {
+        item = { id: this.q, vraag: "", verplicht: false };
+      }
+      return item;
+    },
+  },
   data() {
     return {
-      toolbar:this.$store.state.toolbar.toolbar,
+      toolbar: this.$store.state.toolbar.toolbar,
       countq: 2,
-      item: {id:this.q, vraag: "", verplicht:false },
     };
   },
   methods: {
@@ -43,7 +65,7 @@ export default {
       this.item.opties.splice(i, 1);
       this.countq--;
     },
-    showPreview() {
+    showPreview(e) {
       this.$emit("vraag-preview", this.item);
     },
     deleteItem() {

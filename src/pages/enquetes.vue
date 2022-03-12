@@ -3,21 +3,19 @@
     <div class="row">
       <div class="col">
         <q-table
-        :key="refreshKey"
           :rows="rows"
           :columns="columns"
           :filter="filter"
           :loading="loading"
-          @request="refreshKey++"
           row-key="name"
           no-data-label="Geen enquetes gevonden."
           no-results-label="Geen resultaten gevonden."
           rows-per-page-label="Rijen per pagina"
           flat
           class="bg-grey-3"
+          :pagination="pagination"
+          
         >
-         
-
           <template v-slot:body-cell-campagne="props">
             <td>
               {{ props.value }}
@@ -127,7 +125,7 @@
                 round
                 flat
                 icon="o_edit"
-                :to="'/enquetes/edit/'+props.row.id"
+                :to="'/enquetes/edit/' + props.row.id"
               />
             </q-td>
           </template>
@@ -160,14 +158,17 @@ export default defineComponent({
           permalink: response.data[x].slug,
         });
       }
-    this.loading=false
+      this.loading = false;
     });
   },
   data() {
     return {
-      loading:true,
+      pagination: {
+        rowsPerPage: 10
+      },
+      loading: true,
       filter: "",
-      refreshKey:0,
+
       columns: [
         {
           name: "campagne",
@@ -187,14 +188,14 @@ export default defineComponent({
           name: "resultaten",
           label: "Resultaten",
           sortable: false,
-          field: (row) => row.klant + '#' + row.id ,
+          field: (row) => row.klant + "#" + row.id,
           align: "left",
         },
         {
           name: "permalink",
           label: "Link",
           sortable: false,
-          field: (row) => row.klant + '#' + row.id ,
+          field: (row) => row.klant + "#" + row.id,
           align: "left",
         },
         {
@@ -232,23 +233,21 @@ export default defineComponent({
           persistent: true,
         })
         .onOk((data) => {
-          api.delete(`/surveys/${survey.id}`)
-          .then(response =>{
-            this.filter = ''
-            
-          })
-                 
+          api.delete(`/surveys/${survey.id}`).then((response) => {
+            this.filter = "";
+          });
+
           this.$q.notify({
             message: `${survey.campagne} verwijderd.`,
             icon: "check",
           });
         });
-    this.refreshKey++  
+      this.refreshKey++;
     },
 
     copyPermaLink(e) {
-      var slug = "/#/enquete/" + e.replaceAll(' ', '-').toLowerCase() 
-      
+      var slug = "/#/enquete/" + e.replaceAll(" ", "-").toLowerCase();
+
       var link = window.location.origin + slug;
       navigator.clipboard.writeText(link);
       this.$q.notify({

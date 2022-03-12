@@ -13,6 +13,7 @@
           flat
           class="bg-grey-3"
           :loading="loading"
+          :pagination="pagination"
           
         >
           <template v-slot:body-cell-akties="props">
@@ -114,6 +115,9 @@ export default defineComponent({
   },
   data() {
     return {
+      pagination: {
+        rowsPerPage: 10
+      },
       loading:true,
       componentKey: 0,
       editable: null,
