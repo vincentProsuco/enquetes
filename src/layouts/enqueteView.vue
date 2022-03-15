@@ -2,23 +2,44 @@
   <q-layout view="hHh LpR fFf">
     <q-page-container class="box">
       <div class="flex flex-center">
-        <img :src="require('assets/prosucoLogo.png')" style="max-height:5rem;">
+        <img
+          :src="require('assets/prosucoLogo.png')"
+          style="max-height: 5rem"
+        />
       </div>
-      <q-tab-panels v-model="tab" animated>
+      <q-tab-panels v-model="tab" animated class="q-mt-lg" keep-alive>
         <q-tab-panel
           :name="index"
           v-for="(question, index) in survey"
           :key="index"
         >
-          <div class="text-h6 flex flex-center">
-          <span v-html="question.title"></span>
+          <div class="text-h6 text-center">
+            {{index+1}}/{{nmQuestions}} <span v-html="question.title"></span>
+            <div class="antwoord">
+              
+              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Open vraag'">
+                <q-input v-model="answers[index]" filled type="textarea" />
+              </div>
+
+              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Meerkeuze'">
+                <q-input v-model="answers[index]" filled type="textarea" />
+              </div>
+
+              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Selecteren'">
+                <q-input v-model="answers[index]" filled type="textarea" />
+              </div>
+
+
+              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Rating'">
+                <q-input v-model="answers[index]" filled type="textarea" />
+              </div>
+            </div>
           </div>
         </q-tab-panel>
-        <q-tab-panel
-        name="finnish">
-         <div class="text-h6 flex flex-center">
-         <span v-html="eindtext"></span>
-         </div>
+        <q-tab-panel name="finnish">
+          <div class="text-h6 flex flex-center">
+            <span v-html="eindtext"></span>
+          </div>
         </q-tab-panel>
       </q-tab-panels>
     </q-page-container>
@@ -32,9 +53,28 @@
           indicator-color="grey-10"
           narrow-indicator
         >
-          <q-btn @click.prevent="tab--" label="Vorige" unelevated v-if="tab != 0  && tab != 'finnish'" />
-          <q-btn @click.prevent="tab++" label="Volgende" unelevated v-if="tab != survey.length-1 && tab != 'finnish'" class="q-mx-md"/>
-          <q-btn @click.prevent="postSurvey" label="Versturen" color="primary" unelevated size="md" class="q-mx-md" v-else/>
+          <q-btn
+            @click.prevent="tab--"
+            label="Vorige"
+            unelevated
+            v-if="tab != 0 && tab != 'finnish'"
+          />
+          <q-btn
+            @click.prevent="tab++"
+            label="Volgende"
+            unelevated
+            v-if="tab != survey.length - 1 && tab != 'finnish'"
+            class="q-mx-md"
+          />
+          <q-btn
+            @click.prevent="postSurvey"
+            label="Versturen"
+            color="primary"
+            unelevated
+            size="md"
+            class="q-mx-md"
+            v-else
+          />
         </q-tabs>
       </q-toolbar>
     </q-footer>
@@ -42,35 +82,40 @@
 </template>
 <script>
 import { api } from "boot/axios";
-import { useQuasar } from "quasar"
+import { useQuasar } from "quasar";
 export default {
-  setup(){
-    var $q = useQuasar()
+  setup() {
+    var $q = useQuasar();
   },
   mounted() {
     var id = this.$route.hash.substring(1, this.$route.hash.legth);
     api.get(`/surveys/${id}`).then((response) => {
+      console.log(response.data);
       this.survey = response.data.questions;
-      this.nmQuestions = response.data.questions.length
-      this.eindtext = response.data.completedDescription
+      this.survey.sort(function (a, b) {
+        return a.options[0].id - b.options[0].id;
+      });
+      this.nmQuestions = response.data.questions.length;
+      this.eindtext = response.data.completedDescription;
     });
   },
   data() {
     return {
-      eindtext:null,
+      answers: [""],
+      eindtext: null,
       tab: 0,
-      nmQuestions:0,
+      nmQuestions: 0,
       activeQuestion: 0,
       survey: 0,
     };
   },
   methods: {
-    postSurvey(){
-      this.$q.loading.show()
+    postSurvey() {
+      this.$q.loading.show();
       setTimeout(() => {
-      this.$q.loading.hide()  
+        this.$q.loading.hide();
       }, 1500);
-      this.tab = 'finnish'
+      this.tab = "finnish";
     },
     active(i) {
       if (this.activeQuestion === i) {
@@ -82,19 +127,17 @@ export default {
 </script>
 
 <style scoped>
-
 .question {
   display: flex;
   flex-direction: column;
   align-content: center;
 }
 .box {
-  
   margin-left: auto;
   margin-right: auto;
   width: 500px !important;
   max-width: 95vw !important;
   height: 50vh;
-  padding-top:10vh;
+  padding-top: 10vh;
 }
 </style>
