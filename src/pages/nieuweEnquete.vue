@@ -112,6 +112,7 @@ export default defineComponent({
       this.id = this.$route.params.id;
       api.get(`/surveys/${this.id}`).then((response) => {
         this.editData = response.data;
+        console.log(this.editData)
 
         if (!this.enquete.vragen) {
           this.enquete.vragen = response.data.questions;
@@ -166,6 +167,7 @@ export default defineComponent({
         for(var i = 0; i<this.enquete.vragen.length; i++){
           this.enquete.vragen[i].id=i
           this.enquete.vragen[i].waarde.id=i
+          console.log(this.enquete.vragen)
         }
       
         
@@ -208,19 +210,19 @@ export default defineComponent({
                       
 
         for (var x = 0; x < this.enquete.vragen.length; x++) {
-          var questionData = {
+          if (this.enquete.vragen[x].surveyQuestionId == null) {
+            var questionData = {
             
             title: this.enquete.vragen[x].waarde.vraag,
             slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
             options: [this.enquete.vragen[x].waarde],
             survey: `api/surveys/${this.id}`,
           };
-          if (this.enquete.vragen[x].surveyQuestionId == null) {
             
             api.post("/survey_questions", questionData).then((response)=>{
               this.questionId=response.data.id
               
-            this.enquete.vragen[x-1].surveyQuestionId=this.questionId
+            this.enquete.vragen[x].surveyQuestionId=this.questionId
            
             }).then(()=>{
               
@@ -231,6 +233,7 @@ export default defineComponent({
               title: this.enquete.vragen[x].waarde.vraag,
               slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
               options: [this.enquete.vragen[x].waarde],
+              survey: `api/surveys/${this.id}`,
             };
             api.put(
               `/survey_questions/${this.enquete.vragen[x].surveyQuestionId}`,

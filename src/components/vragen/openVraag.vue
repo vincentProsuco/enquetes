@@ -45,7 +45,7 @@ export default {
       if (this.edit) {
         item = this.edit;
       } else {
-        item = { id: this.q, vraag: "", verplicht: false };
+        item = { id: this.q, vraag: "", verplicht: false, type:"Open vraag" };
       }
       return item;
     },

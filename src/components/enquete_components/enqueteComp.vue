@@ -199,8 +199,8 @@ export default {
   },
   mounted() {
     if (this.editData) {
-    console.log(this.editData)
       for (var i = 0; i < this.editData.questions.length; i++) {
+        console.log(this.editData.questions[i].options[0].type)
         this.items.push({
           surveyQuestionId: this.editData.questions[i].id,
           id: this.ids,
@@ -209,6 +209,7 @@ export default {
           waarde: {
             id: this.editData.questions[i].options[0].id,
             vraag: this.editData.questions[i].options[0].vraag,
+            type: this.editData.questions[i].options[0].type,
             verplicht: this.editData.questions[i].options[0].verplicht,
             ratingStijl: this.editData.questions[i].options[0].ratingStijl,
             opties: this.editData.questions[i].options[0].opties,
