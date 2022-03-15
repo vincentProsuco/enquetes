@@ -1,5 +1,5 @@
 <template>
-  <q-card class="q-pa-md">
+  <q-card class="q-pa-md" flat>
     <q-card-section>
        <q-toggle v-model="item.verplicht" label="Antwoord verplicht?" dense size="sm" icon="close" checked-icon="check"/>
     </q-card-section>

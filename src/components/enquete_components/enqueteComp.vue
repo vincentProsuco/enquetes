@@ -1,6 +1,6 @@
 <template>
   <div class="row q-gutter-md">
-    <div class="col-4" v-if="items.length < 1">
+    <div class="col-6" v-if="items.length < 1">
       <q-card flat>
         <q-card-section class="bg-grey-3">
           <div class="">
@@ -39,120 +39,70 @@
     <div class="col-6">
       <div v-if="items.length > 0">
         <div>
-          <draggable
-            v-model="items"
-            group="people"
-            @start="drag = true"
-            @end="drag = false"
-            item-key="id"
-          >
-            <template #item="{ element }">
-              <div id="vraagContainer">
+          <q-list>
+            <draggable
+              v-model="items"
+              group="people"
+              @start="drag = true"
+              @end="drag = false"
+              item-key="id"
+            >
+              <template #item="{ element }">
                 <q-expansion-item
                   expand-separator
-                  expand-icon="edit"
-                  class="bg-grey-3"
+                  expand-icon="o_edit_note"
+                  :icon="getSettings(element.type).icoon"
+                  class="bg-grey-3 q-mb-sm"
+                  :label="
+                    element.waarde.vraag
+                      ? element.waarde.vraag.substring(0, 20)
+                      : element.name
+                  "
+                  :caption="getSettings(element.type).label"
                 >
-                  <template v-slot:header>
-                    <div
-                      class="flex justify-between q-pa-xs"
-                      style="width: 100%; height: 100%"
-                    >
-                      <q-icon name="drag_indicator" size="sm" />
-                      <span v-if="element.type === 'Open vraag'"
-                        ><q-icon
-                          name="question_answer"
-                          size="xs"
-                          color="indigo-9"
-                        />
-                        <span
-                          class="questionTitle"
-                          v-if="element.waarde.vraag"
-                          v-html="element.waarde.vraag"
-                        ></span>
-                        <span v-else>{{ element.name }}</span>
-                      </span>
-                      <span v-if="element.type === 'Meerkeuze'"
-                        ><q-icon name="checklist" size="xs" color="primary" />
-                        <span
-                          class="questionTitle"
-                          v-if="element.waarde.vraag"
-                          v-html="element.waarde.vraag"
-                        ></span>
-                        <span v-else>{{ element.name }}</span>
-                      </span>
-
-                      <span v-if="element.type === 'Selecteren'"
-                        ><q-icon name="rule" size="xs" color="accent" />
-                         <span
-                          class="questionTitle"
-                          v-if="element.waarde.vraag"
-                          v-html="element.waarde.vraag"
-                        ></span>
-                        <span v-else>{{ element.name }}</span></span
-                      >
-                      <span v-if="element.type === 'Rating'"
-                        ><q-icon name="star" size="xs" color="orange-6" />
-                         <span
-                          class="questionTitle"
-                          v-if="element.waarde.vraag"
-                          v-html="element.waarde.vraag"
-                        ></span>
-                        <span v-else>{{ element.name }}</span></span
-                      >
-                      <span v-if="element.type === 'Tussen pagina'"
-                        ><q-icon name="article" size="xs" color="lime-6" />
-                         <span
-                          class="questionTitle"
-                          v-if="element.waarde.vraag"
-                          v-html="element.waarde.vraag"
-                        ></span>
-                        <span v-else>{{ element.name }}</span></span
-                      >
-                      <span></span>
-                    </div>
-                  </template>
-                  <q-card class="q-pa-md bg-grey-1">
-                    <meer-keuze
-                      v-if="element.type === 'Meerkeuze'"
-                      :q="element.id"
-                      :edit="element.waarde"
-                      @delete-item="deleteItem(element)"
-                      @vraag-preview="updateItems($event, false)"
-                    />
-                    <selecteren
-                      v-if="element.type === 'Selecteren'"
-                      :q="element.id"
-                      :edit="element.waarde"
-                      @delete-item="deleteItem(element)"
-                      @vraag-preview="updateItems($event, false)"
-                    />
-                    <open-vraag
-                      v-if="element.type === 'Open vraag'"
-                      :q="element.id"
-                      :edit="element.waarde"
-                      @delete-item="deleteItem(element)"
-                      @vraag-preview="updateItems($event, false)"
-                    />
-                    <rating
-                      v-if="element.type === 'Rating'"
-                      :q="element.id"
-                      :edit="element.waarde"
-                      @delete-item="deleteItem(element)"
-                      @vraag-preview="updateItems($event, false)"
-                    />
-                    <tussen-pagina
-                      v-if="element.type === 'Tussen pagina'"
-                      :q="element.id"
-                      :edit="element.waarde"
-                      @delete-item="deleteItem(element)"
-                      @vraag-preview="updateItems($event, false)"
-                    />
+                  <q-card>
+                    <q-card-section class="bg-grey-2">
+                      <meer-keuze
+                        v-if="element.type === 'Meerkeuze'"
+                        :q="element.id"
+                        :edit="element.waarde"
+                        @delete-item="deleteItem(element)"
+                        @vraag-preview="updateItems($event, false)"
+                      />
+                      <selecteren
+                        v-if="element.type === 'Selecteren'"
+                        :q="element.id"
+                        :edit="element.waarde"
+                        @delete-item="deleteItem(element)"
+                        @vraag-preview="updateItems($event, false)"
+                      />
+                      <open-vraag
+                        v-if="element.type === 'Open vraag'"
+                        :q="element.id"
+                        :edit="element.waarde"
+                        @delete-item="deleteItem(element)"
+                        @vraag-preview="updateItems($event, false)"
+                      />
+                      <rating
+                        v-if="element.type === 'Rating'"
+                        :q="element.id"
+                        :edit="element.waarde"
+                        @delete-item="deleteItem(element)"
+                        @vraag-preview="updateItems($event, false)"
+                      />
+                      <tussen-pagina
+                        v-if="element.type === 'Tussen'"
+                        :q="element.id"
+                        :edit="element.waarde"
+                        @delete-item="deleteItem(element)"
+                        @vraag-preview="updateItems($event, false)"
+                      />
+                    </q-card-section>
                   </q-card>
                 </q-expansion-item>
-              </div>
-            </template>
-          </draggable>
+              </template>
+            </draggable>
+          </q-list>
         </div>
       </div>
 
@@ -200,7 +150,7 @@ export default {
   mounted() {
     if (this.editData) {
       for (var i = 0; i < this.editData.questions.length; i++) {
-        console.log(this.editData.questions[i].options[0].type)
+        console.log(this.editData.questions[i])
         this.items.push({
           surveyQuestionId: this.editData.questions[i].id,
           id: this.ids,
@@ -218,7 +168,7 @@ export default {
             subvraag: this.editData.questions[i].options[0].subvraag,
           },
         });
-       
+
         this.ids++;
       }
       this.$emit("updateEvent", { val: this.items, cat: "vragen" });
@@ -234,23 +184,23 @@ export default {
         {
           kleur: "indigo-9",
           label: "Open vraag",
-          icoon: "question_answer",
+          icoon: "o_question_answer",
           functie: "Open vraag",
           beschrijving:
             "Bij een open vraag heeft de gebruiker de mogelijkheid zelf een antwoord te typen.",
         },
         {
           kleur: "primary",
-          label: "Meerkeuze vraag",
-          icoon: "checklist",
+          label: "Meerkeuze",
+          icoon: "o_checklist",
           functie: "Meerkeuze",
           beschrijving:
             "De gebruiker heeft de keuze uit meerdere antwoorden en hierbij kunnen er meerdere antwoorden worden geselcteerd.",
         },
         {
           kleur: "accent",
-          label: "Selectie vraag",
-          icoon: "rule",
+          label: "Selecteren",
+          icoon: "o_rule",
           functie: "Selecteren",
           beschrijving:
             "De gebruiker heeft de keuze uit meerdere antwoorden maar er kan slechts één antwoord geselecteerd worden.",
@@ -258,16 +208,16 @@ export default {
         {
           kleur: "orange-6",
           label: "Rating",
-          icoon: "star",
+          icoon: "o_star",
           functie: "Rating",
           beschrijving:
             "Gebruikers kunnen hun mening geven op basis van een schaal van 1 tot 5. Dit kan d.m.v. cijfers, tekst, emoticons of sterren.",
         },
         {
           kleur: "lime-6",
-          label: "Tussen Pagina",
-          icoon: "article",
-          functie: "Tussen pagina",
+          label: "Tussen",
+          icoon: "o_article",
+          functie: "Tussen",
           beschrijving:
             "Met een tussenpagina kun je de gebruiker bijvoorbeeld extra informatie geven over de komende vragen.",
         },
@@ -275,20 +225,35 @@ export default {
     };
   },
   methods: {
+    getSettings(vraagtype) {
+      for (var i = 0; i < this.vraagSoorten.length; i++) {
+        if (this.vraagSoorten[i].functie === vraagtype) {
+          return this.vraagSoorten[i];
+        }
+      }
+    },
     addVraag(k) {
-     
       this.items.push({
         surveyQuestionId: null,
         id: this.ids,
         name: k,
         type: k,
-        waarde: { id: null, vraag: "", opties: ["", ""], subvraag: [""], verplicht: false, type: k,  ratingStijl:"", ratingOpties: [
-          { label: "Verschrikkelijk" },
-          { label: "slecht" },
-          { label: "Redelijk" },
-          { label: "Goed" },
-          { label: "Fantastisch" },
-        ],},
+        waarde: {
+          id: null,
+          vraag: "",
+          opties: ["", ""],
+          subvraag: [""],
+          verplicht: false,
+          type: k,
+          ratingStijl: "",
+          ratingOpties: [
+            { label: "Verschrikkelijk" },
+            { label: "slecht" },
+            { label: "Redelijk" },
+            { label: "Goed" },
+            { label: "Fantastisch" },
+          ],
+        },
       });
       this.ids++;
     },

@@ -1,5 +1,5 @@
 <template>
-  <q-card class="q-pa-md">
+  <q-card class="q-pa-md" flat>
     <q-card-section>
       <q-editor v-model="item.vraag" @keyup="showPreview" :toolbar="toolbar"/>
     </q-card-section>
@@ -20,12 +20,22 @@
 
 <script>
 export default {
-  props: ["q"],
+  props: ["q", "edit"],
   emits: ["vraag-preview", "delete-item"],
+  computed: {
+    item() {
+      var item;
+      if (this.edit) {
+        item = this.edit;
+      } else {
+        item = { id: this.q, vraag: "", type:"Tussen" };
+      }
+      return item;
+    },
+  },
   data() {
     return {
       toolbar:this.$store.state.toolbar.toolbar,
-      item: {id:this.q, vraag:""},
     }
   },
   methods: {    

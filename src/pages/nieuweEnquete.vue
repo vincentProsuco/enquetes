@@ -112,7 +112,7 @@ export default defineComponent({
       this.id = this.$route.params.id;
       api.get(`/surveys/${this.id}`).then((response) => {
         this.editData = response.data;
-        console.log(this.editData)
+        
 
         if (!this.enquete.vragen) {
           this.enquete.vragen = response.data.questions;
@@ -167,7 +167,7 @@ export default defineComponent({
         for(var i = 0; i<this.enquete.vragen.length; i++){
           this.enquete.vragen[i].id=i
           this.enquete.vragen[i].waarde.id=i
-          console.log(this.enquete.vragen)
+          
         }
       
         
