@@ -5,12 +5,12 @@
     </q-card-section>
     <q-card-section>
       <!-- <q-input outlined  v-model="item.titel" label="Titel"/> -->
-      <q-editor v-model="item.titel" label="Titel" :toolbar="toolbar"/>
+      <q-editor v-model="item.vraag" label="Titel" :toolbar="toolbar"/>
     </q-card-section>
-    <q-card-section v-for="(vr, ii) in item.vraag" :key="ii">
+    <q-card-section v-for="(vr, ii) in item.subvraag" :key="ii">
       <q-input
         outlined
-        v-model="item.vraag[ii]"
+        v-model="item.subvraag[ii]"
         :label="'Optie ' + (ii + 1)"
         dense
         @change="showPreview"
@@ -34,7 +34,7 @@
         :options="options"
         label="Rating Stijl"
         outlined
-        v-model="item.type"
+        v-model="item.ratingStijl"
         @change="showPreview"
       >
         <template v-slot:option="scope">
@@ -50,22 +50,18 @@
         </template>
       </q-select>
     </q-card-section>
-    <q-card-section v-if="item.type.value === 'tekst'">
+    <q-card-section v-if="item.ratingStijl.value === 'tekst'">
       <q-input
-        v-for="(q, i) in item.opties"
+        v-for="(q, i) in item.ratingOpties"
         :key="i"
         dense
-        v-model="item.opties[i].label"
-        :label="item.opties[i].label"
+        v-model="item.ratingOpties[i].label"
+        :label="item.ratingOpties[i].label"
         class="q-mb-sm"
-        @change="showPreview"
-      >
-        <!-- <template v-slot:before><q-icon :name="rating_icon[i]" /></template> -->
-      </q-input>
+        @change="showPreview"/>
+    
     </q-card-section>
-    <q-card-section class="flex justify-center" v-if="item.opties.length < 5">
-      <q-btn round color="secondary" icon="add" @click="addAntwoord" />
-    </q-card-section>
+   
     <q-card-actions>
       <q-btn
         color="red"
@@ -81,13 +77,13 @@
 
 <script>
 export default {
-  props: ["q"],
+  props: ["q", "edit"],
   emits: ["vraag-preview", "delete-item"],
   watch: {
     item: {
       deep: true,
       handler(v) {
-        var ic = v.type.value;
+        var ic = v.ratingStijl.value;
 
         if (ic === "sterren") {
           this.rating_icon = [
@@ -119,18 +115,22 @@ export default {
       },
     },
   },
-  data() {
-    return {
-      toolbar:this.$store.state.toolbar.toolbar,
-      rating_icon: ["circle", "circle", "circle", "circle", "circle"],
-      countq: 2,
-      countv: 1,
-      item: {
+  computed: {
+    item() {
+      
+      var item;
+      if (this.edit) {
+        
+        item = this.edit;
+      } else {
+        // item={id:this.q, vraag: "", soort: "", opties: ["", ""], verplicht:false }
+        item= {
         id:this.q,
-        titel: "",
-        vraag: [""],
-        type: "",
-        opties: [
+        vraag: "",
+        type:"",
+        subvraag: [""],
+        ratingStijl: "",
+        ratingOpties: [
           { label: "Verschrikkelijk" },
           { label: "slecht" },
           { label: "Redelijk" },
@@ -138,7 +138,21 @@ export default {
           { label: "Fantastisch" },
         ],
         verplicht:false,
-      },
+      }
+      }
+      
+      
+      return item;
+      
+    },
+  },
+  data() {
+    return {
+      toolbar:this.$store.state.toolbar.toolbar,
+      rating_icon: ["circle", "circle", "circle", "circle", "circle"],
+      countq: 2,
+      countv: 1,
+     
       options: [
         {
           label: "Tekst",
@@ -170,14 +184,14 @@ export default {
     },
     addVraag() {
       this.countv++;
-      this.item.vraag.push("");
+      this.item.subvraag.push("");
     },
     removeOption(i) {
       this.item.opties.splice(i, 1);
       this.countq--;
     },
     removeQuestion(i) {
-      this.item.vraag.splice(i, 1);
+      this.item.subvraag.splice(i, 1);
       this.countv--;
     },
     showPreview() {

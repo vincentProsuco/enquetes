@@ -46,16 +46,26 @@
 
 <script>
 export default {
-  props: ["q"],
+  props: ["q", "edit"],
   emits: ["vraag-preview", "delete-item"],
   mounted() {
     this.showPreview();
   },
+  computed: {
+    item() {
+      var item;
+      if (this.edit) {
+        item = this.edit;
+      } else {
+        item = {id:this.q, vraag:"", opties: ["", ""], verplicht:false }
+      }
+      return item;
+    },
+  },
   data() {
     return {
-      toolbar:this.$store.state.toolbar.toolbar,
+      toolbar:this.$store.state.toolbar.toolbar, 
       countq: 2,
-      item: {id:this.q, vraag:"Dit is een voorbeeld vraag.", opties: ["", ""], verplicht:false },
     };
   },
   methods: {

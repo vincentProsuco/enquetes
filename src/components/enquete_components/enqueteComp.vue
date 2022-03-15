@@ -65,25 +65,49 @@
                           size="xs"
                           color="indigo-9"
                         />
-                       <span v-if="element.waarde.vraag">{{ element.waarde.vraag.substring(0,15) }}...</span>
-                       <span v-else>{{ element.name }}</span>
-                       </span
-                      >
+                        <span
+                          class="questionTitle"
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag"
+                        ></span>
+                        <span v-else>{{ element.name }}</span>
+                      </span>
                       <span v-if="element.type === 'Meerkeuze'"
                         ><q-icon name="checklist" size="xs" color="primary" />
-                        {{ element.name }}</span
-                      >
+                        <span
+                          class="questionTitle"
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag"
+                        ></span>
+                        <span v-else>{{ element.name }}</span>
+                      </span>
+
                       <span v-if="element.type === 'Selecteren'"
                         ><q-icon name="rule" size="xs" color="accent" />
-                        {{ element.name }}</span
+                         <span
+                          class="questionTitle"
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag"
+                        ></span>
+                        <span v-else>{{ element.name }}</span></span
                       >
                       <span v-if="element.type === 'Rating'"
                         ><q-icon name="star" size="xs" color="orange-6" />
-                        {{ element.name }}</span
+                         <span
+                          class="questionTitle"
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag"
+                        ></span>
+                        <span v-else>{{ element.name }}</span></span
                       >
                       <span v-if="element.type === 'Tussen pagina'"
                         ><q-icon name="article" size="xs" color="lime-6" />
-                        {{ element.name }}</span
+                         <span
+                          class="questionTitle"
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag"
+                        ></span>
+                        <span v-else>{{ element.name }}</span></span
                       >
                       <span></span>
                     </div>
@@ -92,12 +116,14 @@
                     <meer-keuze
                       v-if="element.type === 'Meerkeuze'"
                       :q="element.id"
+                      :edit="element.waarde"
                       @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <selecteren
                       v-if="element.type === 'Selecteren'"
                       :q="element.id"
+                      :edit="element.waarde"
                       @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
@@ -111,12 +137,14 @@
                     <rating
                       v-if="element.type === 'Rating'"
                       :q="element.id"
+                      :edit="element.waarde"
                       @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
                     <tussen-pagina
                       v-if="element.type === 'Tussen pagina'"
                       :q="element.id"
+                      :edit="element.waarde"
                       @delete-item="deleteItem(element)"
                       @vraag-preview="updateItems($event, false)"
                     />
@@ -171,18 +199,25 @@ export default {
   },
   mounted() {
     if (this.editData) {
+    console.log(this.editData)
       for (var i = 0; i < this.editData.questions.length; i++) {
         this.items.push({
           surveyQuestionId: this.editData.questions[i].id,
           id: this.ids,
-          name: "Open vraag",
-          type: "Open vraag",
+          name: this.editData.questions[i].options[0].type,
+          type: this.editData.questions[i].options[0].type,
           waarde: {
             id: this.editData.questions[i].options[0].id,
             vraag: this.editData.questions[i].options[0].vraag,
             verplicht: this.editData.questions[i].options[0].verplicht,
+            ratingStijl: this.editData.questions[i].options[0].ratingStijl,
+            opties: this.editData.questions[i].options[0].opties,
+            soort: this.editData.questions[i].options[0].soort,
+            ratingOpties: this.editData.questions[i].options[0].ratingOpties,
+            subvraag: this.editData.questions[i].options[0].subvraag,
           },
         });
+       
         this.ids++;
       }
       this.$emit("updateEvent", { val: this.items, cat: "vragen" });
@@ -240,17 +275,24 @@ export default {
   },
   methods: {
     addVraag(k) {
+     
       this.items.push({
         surveyQuestionId: null,
         id: this.ids,
         name: k,
         type: k,
-        waarde: {id:null, vraag:'', verplicht:false},
+        waarde: { id: null, vraag: "", opties: ["", ""], subvraag: [""], verplicht: false, type: k,  ratingStijl:"", ratingOpties: [
+          { label: "Verschrikkelijk" },
+          { label: "slecht" },
+          { label: "Redelijk" },
+          { label: "Goed" },
+          { label: "Fantastisch" },
+        ],},
       });
       this.ids++;
     },
     deleteItem(e) {
-      api.delete(`survey_questions/${e.surveyQuestionId}`)
+      api.delete(`survey_questions/${e.surveyQuestionId}`);
       for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].id === e.id) {
           this.items.splice(i, 1);
@@ -260,7 +302,6 @@ export default {
     },
     updateItems(e, p) {
       if (p === false) {
-        
         this.items[e.id].waarde = e;
       }
     },
@@ -270,9 +311,7 @@ export default {
     items: {
       deep: true,
       handler() {
-        
         this.$emit("updateEvent", { val: this.items, cat: "vragen" });
-        
       },
     },
   },
@@ -284,5 +323,15 @@ export default {
   border: 1px solid #d1d1d1;
   border-radius: 4px;
   margin-bottom: 0.7rem;
+}
+
+.questionTitle {
+  display: block;
+  float: right;
+  margin-left: 0.5rem;
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

@@ -12,7 +12,7 @@
         :options="options"
         label="Keuze stijl"
         outlined
-        v-model="item.type"
+        v-model="item.soort"
         @change="showPreview"
       >
         <template v-slot:option="scope">
@@ -68,13 +68,25 @@
 
 <script>
 export default {
-  props: ["q"],
+  props: ["q", "edit"],
   emits: ["vraag-preview", "delete-item"],
+  computed: {
+    item() {
+      var item;
+      if (this.edit) {
+        
+        item = this.edit;
+      } else {
+        item={id:this.q, vraag: "", soort: "", opties: ["", ""], verplicht:false }
+      }
+      
+      return item;
+    },
+  },
   data() {
     return {
       toolbar:this.$store.state.toolbar.toolbar,
       countq: 2,
-      item: {id:this.q, vraag: "", type: "", opties: ["", ""], verplicht:false },
       options: [
         {
           label: "Dropdown",

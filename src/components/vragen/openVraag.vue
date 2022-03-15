@@ -21,7 +21,7 @@
     </q-card-section>
     <q-card-actions>
       <q-btn
-        color="red"
+        color="red" 
         flat
         label="vraag verwijderen"
         icon="delete_forever"
