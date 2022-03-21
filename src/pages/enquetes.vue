@@ -13,8 +13,7 @@
           rows-per-page-label="Rijen per pagina"
           flat
           class="bg-grey-3"
-          :pagination="pagination"
-          
+          :pagination="pagination"  
         >
           <template v-slot:body-cell-campagne="props">
             <td>
@@ -118,7 +117,7 @@
                 round
                 flat
                 icon="o_delete"
-                @click="deleteSurvey(props.row)"
+                @click="deleteSurvey(props.row, props.rowIndex)"
               />
               <q-btn
                 size="sm"
@@ -163,6 +162,7 @@ export default defineComponent({
   },
   data() {
     return {
+      refreshToken:0,
       pagination: {
         rowsPerPage: 10
       },
@@ -218,7 +218,7 @@ export default defineComponent({
     };
   },
   methods: {
-    deleteSurvey(survey) {
+    deleteSurvey(survey, ind) {
       this.$q
         .dialog({
           title: `${survey.campagne} verwijderen?`,
@@ -234,15 +234,15 @@ export default defineComponent({
         })
         .onOk((data) => {
           api.delete(`/surveys/${survey.id}`).then((response) => {
-            this.filter = "";
+           this.rows.splice(ind, 1)
           });
-
           this.$q.notify({
             message: `${survey.campagne} verwijderd.`,
             icon: "check",
           });
+         
         });
-      this.refreshKey++;
+      
     },
 
     copyPermaLink(e) {

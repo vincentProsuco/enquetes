@@ -14,7 +14,6 @@
           class="bg-grey-3"
           :loading="loading"
           :pagination="pagination"
-          
         >
           <template v-slot:body-cell-akties="props">
             <q-td :props="props">
@@ -23,7 +22,7 @@
                 round
                 flat
                 icon="o_delete"
-                @click="deleteKlant(props.row)"
+                @click="deleteKlant(props.row, props.rowIndex)"
               />
               <q-btn
                 size="sm"
@@ -35,7 +34,7 @@
             </q-td>
           </template>
 
-        <template v-slot:top-right>
+          <template v-slot:top-right>
             <q-input
               outlined
               v-model="filter"
@@ -88,13 +87,16 @@
           size="xs"
           @click="dialog = false"
       /></q-card-section>
-      <nieuwe-klant-form :klantEdit="selectedKlant" @form-send="klantAdded($event)"/>
+      <nieuwe-klant-form
+        :klantEdit="selectedKlant"
+        @form-send="klantAdded($event)"
+      />
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-import { api } from 'boot/axios';
+import { api } from "boot/axios";
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import nieuweKlantForm from "src/components/nieuweKlantForm.vue";
@@ -107,18 +109,20 @@ export default defineComponent({
     $q.loadingBar.start();
   },
   mounted() {
-    this.forceRerender()
+    this.forceRerender();
     this.$q.loadingBar.stop();
-    if(window.location.hash.substr(window.location.hash.length - 3) === 'new'){
-      this.dialog=true
+    if (
+      window.location.hash.substr(window.location.hash.length - 3) === "new"
+    ) {
+      this.dialog = true;
     }
   },
   data() {
     return {
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
-      loading:true,
+      loading: true,
       componentKey: 0,
       editable: null,
       dialog: false,
@@ -155,21 +159,21 @@ export default defineComponent({
     },
   },
   methods: {
-    forceRerender(){
-      api.get('/clients').then(response => {
-      this.rows=response.data
-    })
-    this.loading = false
+    forceRerender() {
+      api.get("/clients").then((response) => {
+        this.rows = response.data;
+      });
+      this.loading = false;
     },
-    klantAdded(m){
-      this.dialog=false;
-      this.forceRerender()
-       this.$q.notify({
-            message: m,
-            icon: "check",
-          });
+    klantAdded(m) {
+      this.dialog = false;
+      this.forceRerender();
+      this.$q.notify({
+        message: m,
+        icon: "check",
+      });
     },
-    deleteKlant(klant) {
+    deleteKlant(klant, ind) {
       this.$q
         .dialog({
           title: `${klant.name} verwijderen?`,
@@ -184,12 +188,14 @@ export default defineComponent({
           persistent: true,
         })
         .onOk((data) => {
-          api.delete(`/clients/${klant.id}`);          
+          api.delete(`/clients/${klant.id}`).then(() => {
+            this.rows.splice(ind, 1);
+          });
+
           this.$q.notify({
             message: `${klant.name} verwijderd.`,
             icon: "check",
           });
-          this.forceRerender()
         });
     },
     editKlant(klantId) {

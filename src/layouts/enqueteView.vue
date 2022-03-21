@@ -18,11 +18,21 @@
             <div class="antwoord">
               
               <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Open vraag'">
-                <q-input v-model="answers[index]" filled type="textarea" />
+                <q-input v-model="answers[index].index" filled type="textarea" />
               </div>
 
               <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Meerkeuze'">
-                <q-input v-model="answers[index]" filled type="textarea" />
+                <q-list>
+                   <q-item tag="label" v-ripple v-for="(optie, i) in question.options[0].opties" :key="i">
+        <q-item-section avatar>
+          <q-checkbox v-model="answers[index].index.i" :val="optie" color="primary" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{optie}}</q-item-label>
+        </q-item-section>
+      </q-item>
+                  
+                </q-list>
               </div>
 
               <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Selecteren'">
@@ -97,11 +107,15 @@ export default {
       });
       this.nmQuestions = response.data.questions.length;
       this.eindtext = response.data.completedDescription;
+      for(var n =0; n < this.nmQuestions; n++){
+        
+        this.answers.push({n:[]})
+      }
     });
   },
   data() {
     return {
-      answers: [""],
+      answers: [],
       eindtext: null,
       tab: 0,
       nmQuestions: 0,
