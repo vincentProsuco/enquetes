@@ -184,6 +184,7 @@ export default defineComponent({
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         client: `api/clients/${this.enquete.settings.client.value.id}`,
+        options:[{status:this.enquete.settings.status}]
       };
 
       if (this.id === null) {

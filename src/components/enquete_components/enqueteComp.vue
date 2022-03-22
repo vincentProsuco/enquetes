@@ -55,10 +55,10 @@
                   class="bg-grey-3 q-mb-sm"
                   :label="
                     element.waarde.vraag
-                      ? element.waarde.vraag.substring(0, 20)
+                      ? element.waarde.vraag.substring(0, 24)+'...'
                       : element.name
                   "
-                  :caption="getSettings(element.type).label"
+                  :caption="'Type: '+getSettings(element.type).label"
                 >
                   <q-card>
                     <q-card-section class="bg-grey-2">

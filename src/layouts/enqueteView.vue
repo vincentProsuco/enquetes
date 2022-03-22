@@ -1,5 +1,19 @@
 <template>
-  <q-layout view="hHh LpR fFf">
+  <q-layout view="hHh LpR fFf" v-if="status === false">
+    <q-page-container>
+      <div class="flex flex-center" style="min-height:100vh;">
+           <span>\(^Д^)/</span>
+           <span>Deze enquête is niet (meer) beschikbaar.</span>
+      </div>
+    </q-page-container>
+  </q-layout>
+  <q-layout view="hHh LpR fFf" v-else>
+    <q-toolbar class="bg-warning flex flex-center" v-if="status === null">
+      <span class="text-bold">
+      <q-icon name ="o_warning"/>
+        Let op: Enquête is in testmodus!
+      </span>
+    </q-toolbar>
     <q-page-container class="box">
       <div class="flex flex-center">
         <img
@@ -13,49 +27,24 @@
           v-for="(question, index) in survey"
           :key="index"
         >
-          <div class="text-h6 text-center">
-            {{index+1}}/{{nmQuestions}} <span v-html="question.title"></span>
-            <div class="antwoord">
-              
-              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Open vraag'">
-                <q-input v-model="answers[index].index" filled type="textarea" />
-              </div>
+        
+        <open-vraag :question="question" v-if="question.options[0].type === 'Open vraag'"/>
+        <meer-keuze :question="question" v-if="question.options[0].type === 'Meerkeuze'"/>
+        <selectie :question="question" v-if="question.options[0].type === 'Selecteren'"/>
+        <tussen-pagina :question="question" v-if="question.options[0].type === 'Tussen'"/>
+        <rating :question="question" v-if="question.options[0].type === 'Rating'"/>
 
-              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Meerkeuze'">
-                <q-list>
-                   <q-item tag="label" v-ripple v-for="(optie, i) in question.options[0].opties" :key="i">
-        <q-item-section avatar>
-          <q-checkbox v-model="answers[index].index.i" :val="optie" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>{{optie}}</q-item-label>
-        </q-item-section>
-      </q-item>
-                  
-                </q-list>
-              </div>
-
-              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Selecteren'">
-                <q-input v-model="answers[index]" filled type="textarea" />
-              </div>
-
-
-              <div class="openVraagAntwoord q-mt-md" v-if="question.options[0].type === 'Rating'">
-                <q-input v-model="answers[index]" filled type="textarea" />
-              </div>
-            </div>
-          </div>
         </q-tab-panel>
         <q-tab-panel name="finnish">
           <div class="text-h6 flex flex-center">
-            <span v-html="eindtext"></span>
+            <span v-html="eindtext" class="text-center"></span>
           </div>
         </q-tab-panel>
       </q-tab-panels>
     </q-page-container>
 
     <q-footer class="bg-grey-3 text-white">
-      <q-toolbar class="flex flex-center" v-if="tab != 'finnish'">
+      <q-toolbar class="flex flex-center" v-if="tab != 'finnish' && status != false">
         <q-tabs
           v-model="tab"
           class="text-grey-10"
@@ -93,7 +82,13 @@
 <script>
 import { api } from "boot/axios";
 import { useQuasar } from "quasar";
+import openVraag from 'src/components/public/openVraag.vue';
+import MeerKeuze from 'src/components/public/meerKeuze.vue';
+import Selectie from 'src/components/public/selectie.vue';
+import TussenPagina from 'src/components/public/tussenPagina.vue';
+import Rating from 'src/components/public/rating.vue';
 export default {
+  components: { openVraag, MeerKeuze, Selectie, TussenPagina, Rating },
   setup() {
     var $q = useQuasar();
   },
@@ -101,6 +96,7 @@ export default {
     var id = this.$route.hash.substring(1, this.$route.hash.legth);
     api.get(`/surveys/${id}`).then((response) => {
       console.log(response.data);
+      this.status = response.data.options[0].status
       this.survey = response.data.questions;
       this.survey.sort(function (a, b) {
         return a.options[0].id - b.options[0].id;
@@ -121,6 +117,7 @@ export default {
       nmQuestions: 0,
       activeQuestion: 0,
       survey: 0,
+      status:null,
     };
   },
   methods: {
