@@ -122,7 +122,7 @@ export default {
       stijl: {
       deep: true,
       handler(){
-        this.$emit('updateEvent', {val:this.items, cat:'stijl'})
+        this.$emit('updateEvent', {val:this.stijl, cat:'stijl'})
       }
         }
   },

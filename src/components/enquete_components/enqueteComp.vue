@@ -51,15 +51,28 @@
                 <q-expansion-item
                   expand-separator
                   expand-icon="o_edit_note"
-                  :icon="getSettings(element.type).icoon"
                   class="bg-grey-3 q-mb-sm"
-                  :label="
-                    element.waarde.vraag
-                      ? element.waarde.vraag.substring(0, 24)+'...'
-                      : element.name
-                  "
-                  :caption="'Type: '+getSettings(element.type).label"
+                  :caption="'Type: ' + getSettings(element.type).label"
                 >
+                  <template v-slot:header>
+                    <q-item-section avatar>
+                      <q-icon
+                        :name="getSettings(element.type).icoon"
+                        :color="getSettings(element.type).kleur"
+                        size="xs"
+                      /></q-item-section>
+                      <q-item-section>
+                        <q-item-label>
+                        <span
+                          v-if="element.waarde.vraag"
+                          v-html="element.waarde.vraag.substring(0, 24) + '...'"
+                        ></span>
+                        <span v-else>{{ element.name }}</span>
+                      </q-item-label>
+                      <q-item-label caption>Type:{{element.name}}</q-item-label>
+                      </q-item-section>
+                      
+                  </template>
                   <q-card>
                     <q-card-section class="bg-grey-2">
                       <meer-keuze
@@ -150,7 +163,6 @@ export default {
   mounted() {
     if (this.editData) {
       for (var i = 0; i < this.editData.questions.length; i++) {
-        console.log(this.editData.questions[i])
         this.items.push({
           surveyQuestionId: this.editData.questions[i].id,
           id: this.ids,
@@ -283,21 +295,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-#vraagContainer {
-  border: 1px solid #d1d1d1;
-  border-radius: 4px;
-  margin-bottom: 0.7rem;
-}
-
-.questionTitle {
-  display: block;
-  float: right;
-  margin-left: 0.5rem;
-  width: 150px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-</style>

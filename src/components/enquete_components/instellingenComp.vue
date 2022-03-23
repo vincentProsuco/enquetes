@@ -64,7 +64,7 @@ export default {
   emits: ["updateEvent"],
   data() {
     return {
-      settings:{
+      settings: {
         client: "",
         name: "",
         status: null,
@@ -75,12 +75,23 @@ export default {
     };
   },
   watch: {
-    editData(val){
-      this.settings.client = {label:this.editData.client.name, value:this.editData.client};
-      this.settings.name = this.editData.name
-      this.settings.status = this.editData.status
-      this.settings.completedDescription = this.editData.completedDescription
-      
+    editData(val) {
+      if (val.status === "true") {
+        this.settings.status = true;
+      }
+      if (val.status === "null") {
+        this.settings.status = null;
+      } 
+       if (val.status === "false") {
+        this.settings.status = false;
+      } 
+      this.settings.client = {
+        label: this.editData.client.name,
+        value: this.editData.client,
+      };
+      this.settings.name = this.editData.name;
+      // this.settings.status = this.editData.status
+      this.settings.completedDescription = this.editData.completedDescription;
     },
     settings: {
       deep: true,

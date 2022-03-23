@@ -3,8 +3,8 @@
     <span v-html="vraag" class="text-h6"></span>
   </div>
 
-  <div class="iconAnswers" v-if="ratingStijl != 'tekst'">
-    <q-list class="q-mt-md" separator>
+  <div class="iconAnswers q-mt-md" v-if="ratingStijl != 'tekst'">
+    <q-list separator>
       <q-item v-for="(subvraag, i) in subVragen" :key="subvraag">
         <q-item-section>
           <q-item-label>{{ subvraag }}</q-item-label>
@@ -21,11 +21,22 @@
       </q-item>
     </q-list>
   </div>
+
+  <div class="tekstAnswers q-mt-md" v-else>
+    <div class="subvraag q-mb-md" v-for="(subvraag, i) in subVragen" :key="subvraag">
+    <q-select :options="ratingOpties" label="" v-model="antwoorden[i]" clearable outlined>
+      <template v-slot:label>
+        <span v-html="subvraag"></span>
+      </template>
+    </q-select>
+    </div>    
+
+  </div>
 </template>
 
 <script>
 export default {
-  props: ["question"],
+  props: ["question", "stijl"],
   computed: {
     icon() {
       if (this.question.options[0].ratingStijl.value === "sterren") {
@@ -58,7 +69,8 @@ export default {
       subVragen: this.question.options[0].subvraag,
       ratingOptions: this.question.options[0].ratingOpties,
       ratingStijl: this.question.options[0].ratingStijl.value,
-      antwoorden: [0],
+      antwoorden: [],
+      ratingOpties:this.question.options[0].ratingOpties
     };
   },
 };

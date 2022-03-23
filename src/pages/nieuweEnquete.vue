@@ -45,7 +45,7 @@
           color="secondary"
           icon="save"
           :disabled="save"
-          @click="saveEnquete"
+          @click.prevent="saveEnquete"
           unelevated
         />
         <q-tooltip style="overflow: hidden" v-if="save">
@@ -112,7 +112,6 @@ export default defineComponent({
       this.id = this.$route.params.id;
       api.get(`/surveys/${this.id}`).then((response) => {
         this.editData = response.data;
-        
 
         if (!this.enquete.vragen) {
           this.enquete.vragen = response.data.questions;
@@ -161,6 +160,7 @@ export default defineComponent({
       }
       if (e.cat === "stijl") {
         this.enquete.stijl = e.val;
+        console.log(this.enquete.stijl)
       }
       if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
@@ -184,7 +184,7 @@ export default defineComponent({
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         client: `api/clients/${this.enquete.settings.client.value.id}`,
-        options:[{status:this.enquete.settings.status}]
+        options:[this.enquete.stijl]
       };
 
       if (this.id === null) {
@@ -208,10 +208,11 @@ export default defineComponent({
       });
 
       if (this.enquete.vragen) {
+        
                       
 
         for (var x = 0; x < this.enquete.vragen.length; x++) {
-          if (this.enquete.vragen[x].surveyQuestionId == null) {
+          if (this.enquete.vragen[x].surveyQuestionId === null) {
             var questionData = {
             
             title: this.enquete.vragen[x].waarde.vraag,

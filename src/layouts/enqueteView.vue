@@ -2,8 +2,9 @@
   <q-layout view="hHh LpR fFf" v-if="status === false">
     <q-page-container>
       <div class="flex flex-center" style="min-height:100vh;">
-           <span>\(^Д^)/</span>
-           <span>Deze enquête is niet (meer) beschikbaar.</span>
+        <div class="centerContainer flex justify-content-center">
+           <span class="text-bold">Sorry, deze enquête is niet (meer) beschikbaar.</span>
+        </div> 
       </div>
     </q-page-container>
   </q-layout>
@@ -21,11 +22,12 @@
           style="max-height: 5rem"
         />
       </div>
-      <q-tab-panels v-model="tab" animated class="q-mt-lg" keep-alive>
+      <q-tab-panels v-model="tab" class="q-mt-lg" keep-alive>
         <q-tab-panel
           :name="index"
           v-for="(question, index) in survey"
           :key="index"
+          class="bg-secondary"
         >
         
         <open-vraag :question="question" v-if="question.options[0].type === 'Open vraag'"/>
@@ -35,7 +37,8 @@
         <rating :question="question" v-if="question.options[0].type === 'Rating'"/>
 
         </q-tab-panel>
-        <q-tab-panel name="finnish">
+        <q-tab-panel name="finnish"
+        class="bg-secondary">
           <div class="text-h6 flex flex-center">
             <span v-html="eindtext" class="text-center"></span>
           </div>
@@ -44,7 +47,7 @@
     </q-page-container>
 
     <q-footer class="bg-grey-3 text-white">
-      <q-toolbar class="flex flex-center" v-if="tab != 'finnish' && status != false">
+      <q-toolbar class="flex flex-center bottomTool" v-if="tab != 'finnish' && status != false">
         <q-tabs
           v-model="tab"
           class="text-grey-10"
@@ -57,13 +60,18 @@
             label="Vorige"
             unelevated
             v-if="tab != 0 && tab != 'finnish'"
+            class="navBtn"
+            color="dark"
+            
           />
           <q-btn
             @click.prevent="tab++"
             label="Volgende"
             unelevated
             v-if="tab != survey.length - 1 && tab != 'finnish'"
-            class="q-mx-md"
+            class="q-mx-md navBtn"
+            color="dark"
+            
           />
           <q-btn
             @click.prevent="postSurvey"
@@ -71,15 +79,18 @@
             color="primary"
             unelevated
             size="md"
-            class="q-mx-md"
+            class="q-mx-md sendBtn"
             v-else
+            :disable="!status"
           />
         </q-tabs>
       </q-toolbar>
     </q-footer>
   </q-layout>
 </template>
+
 <script>
+import { colors, setCssVar } from 'quasar'
 import { api } from "boot/axios";
 import { useQuasar } from "quasar";
 import openVraag from 'src/components/public/openVraag.vue';
@@ -93,10 +104,29 @@ export default {
     var $q = useQuasar();
   },
   mounted() {
-    var id = this.$route.hash.substring(1, this.$route.hash.legth);
+    var id = this.$route.hash.substring(1, this.$route.hash.length);
+    var client = this.$route.path.split('/').pop();
     api.get(`/surveys/${id}`).then((response) => {
-      console.log(response.data);
-      this.status = response.data.options[0].status
+      if(response.data.client.name.replaceAll(' ', '-').toLowerCase() != client){
+        this.status = false
+        return
+      }
+      else{
+      console.log(response.data.options[0])
+      document.body.style.backgroundColor = response.data.options[0].achtergrondkleur
+      document.body.style.color = response.data.options[0].fontcolor
+      document.querySelector('.bottomTool').style.backgroundColor  = response.data.options[0].achtergrondkleur
+      setCssVar('primary', response.data.options[0].btncolor)
+      setCssVar('secondary', response.data.options[0].achtergrondkleur)
+      var link = document.createElement('link');
+      link.setAttribute('rel', 'stylesheet');
+      link.setAttribute('type', 'text/css');
+      link.setAttribute('href', `https://fonts.googleapis.com/css?family=${response.data.options[0].fontface.label.replace(' ', '+')}:400italic,400,300,700`);
+      document.head.appendChild(link);
+      document.body.style.fontFamily = response.data.options[0].fontface.label
+      this.stijl = response.data.options[0]
+      this.font = response.data.options[0].fontface
+      this.status = response.data.status
       this.survey = response.data.questions;
       this.survey.sort(function (a, b) {
         return a.options[0].id - b.options[0].id;
@@ -107,10 +137,13 @@ export default {
         
         this.answers.push({n:[]})
       }
+      }
     });
   },
   data() {
     return {
+      stijl:null,
+      font:null,
       answers: [],
       eindtext: null,
       tab: 0,
@@ -137,7 +170,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .question {
   display: flex;
   flex-direction: column;
@@ -151,4 +184,5 @@ export default {
   height: 50vh;
   padding-top: 10vh;
 }
+
 </style>
