@@ -61,7 +61,9 @@
             unelevated
             v-if="tab != 0 && tab != 'finnish'"
             class="navBtn"
-            color="dark"
+            color="primary"
+            flat
+            icon="o_chevron_left"
             
           />
           <q-btn
@@ -70,8 +72,9 @@
             unelevated
             v-if="tab != survey.length - 1 && tab != 'finnish'"
             class="q-mx-md navBtn"
-            color="dark"
-            
+            color="primary"
+            flat
+            icon-right="o_navigate_next"
           />
           <q-btn
             @click.prevent="postSurvey"
@@ -100,6 +103,7 @@ import TussenPagina from 'src/components/public/tussenPagina.vue';
 import Rating from 'src/components/public/rating.vue';
 export default {
   components: { openVraag, MeerKeuze, Selectie, TussenPagina, Rating },
+  props:['demo'],
   setup() {
     var $q = useQuasar();
   },
@@ -112,7 +116,6 @@ export default {
         return
       }
       else{
-      console.log(response.data.options[0])
       document.body.style.backgroundColor = response.data.options[0].achtergrondkleur
       document.body.style.color = response.data.options[0].fontcolor
       document.querySelector('.bottomTool').style.backgroundColor  = response.data.options[0].achtergrondkleur

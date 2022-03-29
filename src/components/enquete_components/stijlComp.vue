@@ -10,8 +10,9 @@
         use-input
         input-debounce="0"
         label="Lettertype"
-        :options="rows"
+        :options="options"
         behavior="dialog"
+        @filter="filterFn"
         outlined
 
       >
@@ -90,25 +91,40 @@
 
 <script>
 import { useStore } from 'vuex'
+import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import { api } from 'boot/axios'
 
 export default {
   props:['save', 'editData'],
   setup(){
     var $store = useStore()
-    $store.dispatch('googlefonts/getFonts') 
+    var $q = useQuasar()
+    $q.loading.show()
+    $store.dispatch('googlefonts/getFonts')
+  },
+  mounted(){
+    api.get('/')
+    this.$q.loading.hide()
+    this.$emit('updateEvent', {val:this.stijl, cat:'stijl'})
+    if(this.editData.options[0]){
+       this.stijl.fontface = this.editData.options[0].fontface
+       this.stijl.fontcolor = this.editData.options[0].fontcolor
+       this.stijl.achtergrondkleur = this.editData.options[0].achtergrondkleur
+       this.stijl.btncolor = this.editData.options[0].btncolor
+    }
+   
   },
   data() {
     return {
       options:ref(this.rows),
-      stringOptions:[],
       rows:this.$store.state.googlefonts.googlefonts,
       showFonts:false,
       loading: false,
       stijl: {
-        fontface: "",
+        fontface: {label:'Roboto', value:'Roboto'},
         fontcolor: "#000",
-        achtergrondkleur: "#fff",
+        achtergrondkleur: "#ffffff",
         btncolor: "#26A69A",
         textalign: "center",
         logo: "top",
@@ -124,20 +140,23 @@ export default {
       handler(){
         this.$emit('updateEvent', {val:this.stijl, cat:'stijl'})
       }
-        }
+        },
+    editData(val) {
+      console.log(val)
+    },
   },
   methods:{
       filterFn (val, update) {
         if (val === '') {
           update(() => {
-            options.value = this.stringOptions
+            this.options = this.$store.state.googlefonts.googlefonts
           })
           return
         }
        
         update(() => {
           const needle = val.toLowerCase()
-          options.value = this.stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+          this.options = this.options.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         })
       }
     }

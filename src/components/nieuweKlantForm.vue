@@ -72,8 +72,15 @@ export default {
     };
   },
   methods:{
-    validate(val){
-
+    validate(e){
+      if(e && e.length < 3){
+         return {status:true, message:"lorem ipsum"}
+      }
+      else{
+        return {status:false, message:''}
+      }
+     
+      
     },
     save(){
       var data = {

@@ -18,7 +18,7 @@ export default {
    async created(){
     const fonts = await api.get();
     this.rows = fonts.data.items
-    console.log(this.rows)
+    
   }, 
   data() {
     return {

@@ -21,7 +21,6 @@
         @click="activeTab = 'Enquête'"
         :disable="id === null"
       />
-      {{ questionId }}
     </q-tabs>
     <div class="">
       <span
@@ -80,11 +79,7 @@
   <q-dialog v-model="previewMode" full-width>
     <q-card class="">
       <q-card-section>
-        <enquete-preview
-          :settings="enquete.settings"
-          :stijl="enquete.stijl"
-          :vragen="enquete.vragen"
-        />
+        <enquete-view :demo="true"/>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -98,9 +93,10 @@ import enqueteComp from "src/components/enquete_components/enqueteComp.vue";
 import stijlComp from "src/components/enquete_components/stijlComp.vue";
 import instellingenComp from "src/components/enquete_components/instellingenComp.vue";
 import EnquetePreview from "src/components/enquete_components/enquetePreview.vue";
+import EnqueteView from "src/layouts/enqueteView.vue";
 
 export default defineComponent({
-  components: { enqueteComp, stijlComp, instellingenComp, EnquetePreview },
+  components: { enqueteComp, stijlComp, instellingenComp, EnquetePreview, EnqueteView },
   name: "PageIndex",
   setup() {
     const $q = useQuasar();
@@ -160,7 +156,7 @@ export default defineComponent({
       }
       if (e.cat === "stijl") {
         this.enquete.stijl = e.val;
-        console.log(this.enquete.stijl)
+        
       }
       if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
@@ -230,6 +226,7 @@ export default defineComponent({
               
             })
           } else {
+            if(this.enquete.vragen[x].waarde){
             var questionData = {
               
               title: this.enquete.vragen[x].waarde.vraag,
@@ -240,7 +237,7 @@ export default defineComponent({
             api.put(
               `/survey_questions/${this.enquete.vragen[x].surveyQuestionId}`,
               questionData
-            );
+            );}
           }
         }
       }
