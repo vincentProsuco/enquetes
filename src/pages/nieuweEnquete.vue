@@ -182,7 +182,7 @@ export default defineComponent({
         client: `api/clients/${this.enquete.settings.client.value.id}`,
         options:[this.enquete.stijl]
       };
-
+      console.log(this.enquete.stijl)
       if (this.id === null) {
         var apiSettings = api
           .post("/surveys", settingsData)

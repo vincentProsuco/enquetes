@@ -35,6 +35,24 @@
                 />
               </q-item-section>
             </q-item>
+            
+          </q-list>
+
+            <q-list bordered class="q-mt-md">
+            <q-item tag="label" v-ripple>
+              <q-item-section>
+                <q-item-label class="text-bold">Anoniem invullen toestaan?</q-item-label>
+              </q-item-section>
+              <q-item-section avatar>
+                <q-toggle
+                  v-model="settings.anoniem"
+                  checked-icon="o_check"
+                  unchecked-icon="o_close"
+                  color="secondary"
+                />
+              </q-item-section>
+            </q-item>
+            
           </q-list>
 
           <q-list bordered class="q-mt-md">
@@ -66,6 +84,7 @@ export default {
     return {
       settings: {
         client: "",
+        anoniem:true,
         name: "",
         status: null,
         completedDescription: "Hartelijk dank voor uw deelname.",
