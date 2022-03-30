@@ -5,7 +5,7 @@
 
   <div class="iconAnswers q-mt-md" v-if="ratingStijl != 'tekst'">
     <q-list separator>
-      <q-item v-for="(subvraag, i) in subVragen" :key="subvraag">
+      <q-item v-for="(subvraag, i) in answers" :key="subvraag">
         <q-item-section>
           <q-item-label>{{ subvraag }}</q-item-label>
         </q-item-section>
@@ -13,7 +13,7 @@
           <q-rating
             size="sm"
             :icon="icon"
-            v-model="antwoorden[i]"
+            v-model="answers[i].antwoord"
             class="q-py-md"
             color="primary"
           />
@@ -23,21 +23,30 @@
   </div>
 
   <div class="tekstAnswers q-mt-md" v-else>
-    <div class="subvraag q-mb-md" v-for="(subvraag, i) in subVragen" :key="subvraag">
-    <q-select :options="ratingOpties" label="" v-model="antwoorden[i]" clearable outlined>
+    <div class="subvraag q-mb-md" v-for="(subvraag, i) in answers" :key="subvraag.vraag">
+    <q-select :options="ratingOpties" :label="answers[i].vraag" v-model="answers[i].antwoord" clearable outlined>
       <template v-slot:label>
-        <span v-html="subvraag"></span>
+        <span v-html="subvraag.vraag"></span>
       </template>
     </q-select>
     </div>    
 
   </div>
+  {{answers}}
 </template>
 
 <script>
 export default {
   props: ["question", "stijl"],
+  emits:['answered-question'],
   computed: {
+    answers(){
+      var answers = []
+      for(var sv =0; sv < this.question.options[0].subvraag.length; sv++){
+        answers.push({vraag:this.question.options[0].subvraag[sv], antwoord:null})
+      }
+      return answers
+    },
     icon() {
       if (this.question.options[0].ratingStijl.value === "sterren") {
         return "star";
@@ -69,10 +78,14 @@ export default {
       subVragen: this.question.options[0].subvraag,
       ratingOptions: this.question.options[0].ratingOpties,
       ratingStijl: this.question.options[0].ratingStijl.value,
-      antwoorden: [],
       ratingOpties:this.question.options[0].ratingOpties
     };
   },
+  watch:{
+    antwoorden(){
+      this.$emit('answered-question', this.antwoorden)
+    }
+  }
 };
 </script>
 

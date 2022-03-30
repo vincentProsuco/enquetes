@@ -95,6 +95,7 @@ export default {
   },
   watch: {
     editData(val) {
+      console.log(val)
       if (val.status === "true") {
         this.settings.status = true;
       }
@@ -109,7 +110,7 @@ export default {
         value: this.editData.client,
       };
       this.settings.name = this.editData.name;
-      // this.settings.status = this.editData.status
+      this.settings.anoniem = val.options[1].anoniem
       this.settings.completedDescription = this.editData.completedDescription;
     },
     settings: {

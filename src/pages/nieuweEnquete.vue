@@ -79,7 +79,7 @@
   <q-dialog v-model="previewMode" full-width>
     <q-card class="">
       <q-card-section>
-        <enquete-view :demo="true"/>
+        <enquete-view :demo="true" />
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -96,7 +96,13 @@ import EnquetePreview from "src/components/enquete_components/enquetePreview.vue
 import EnqueteView from "src/layouts/enqueteView.vue";
 
 export default defineComponent({
-  components: { enqueteComp, stijlComp, instellingenComp, EnquetePreview, EnqueteView },
+  components: {
+    enqueteComp,
+    stijlComp,
+    instellingenComp,
+    EnquetePreview,
+    EnqueteView,
+  },
   name: "PageIndex",
   setup() {
     const $q = useQuasar();
@@ -124,7 +130,7 @@ export default defineComponent({
   },
   data() {
     return {
-      questionId:null,
+      questionId: null,
       editData: null,
       id: null,
       preview: true,
@@ -144,7 +150,14 @@ export default defineComponent({
       ],
       enquete: {
         settings: null,
-        stijl: null,
+        stijl: {
+        fontface: { label: "Roboto", value: "Roboto" },
+        fontcolor: "#000",
+        achtergrondkleur: "#ffffff",
+        btncolor: "#26A69A",
+        textalign: "center",
+        logo: "top",
+      },
         vragen: null,
       },
     };
@@ -154,19 +167,15 @@ export default defineComponent({
       if (e.cat === "instellingen") {
         this.enquete.settings = e.val;
       }
-      if (e.cat === "stijl") {
+      else if (e.cat === "stijl") {
         this.enquete.stijl = e.val;
-        
       }
-      if (e.cat === "vragen") {
+      else if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
-        for(var i = 0; i<this.enquete.vragen.length; i++){
-          this.enquete.vragen[i].id=i
-          this.enquete.vragen[i].waarde.id=i
-          
+        for (var i = 0; i < this.enquete.vragen.length; i++) {
+          this.enquete.vragen[i].id = i;
+          this.enquete.vragen[i].waarde.id = i;
         }
-      
-        
       }
 
       this.save = false;
@@ -180,9 +189,9 @@ export default defineComponent({
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         client: `api/clients/${this.enquete.settings.client.value.id}`,
-        options:[this.enquete.stijl]
+        options: [this.enquete.stijl, {anoniem:this.enquete.settings.anoniem}],
       };
-      console.log(this.enquete.stijl)
+      console.log(this.enquete.stijl);
       if (this.id === null) {
         var apiSettings = api
           .post("/surveys", settingsData)
@@ -203,41 +212,37 @@ export default defineComponent({
         });
       });
 
-      if (this.enquete.vragen) {
-        
-                      
-
+      if (this.enquete.vragen != null) {
         for (var x = 0; x < this.enquete.vragen.length; x++) {
           if (this.enquete.vragen[x].surveyQuestionId === null) {
             var questionData = {
-            
-            title: this.enquete.vragen[x].waarde.vraag,
-            slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
-            options: [this.enquete.vragen[x].waarde],
-            survey: `api/surveys/${this.id}`,
-          };
-            
-            api.post("/survey_questions", questionData).then((response)=>{
-              this.questionId=response.data.id
-              
-            this.enquete.vragen[x].surveyQuestionId=this.questionId
-           
-            }).then(()=>{
-              
-            })
-          } else {
-            if(this.enquete.vragen[x].waarde){
-            var questionData = {
-              
               title: this.enquete.vragen[x].waarde.vraag,
               slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
               options: [this.enquete.vragen[x].waarde],
               survey: `api/surveys/${this.id}`,
             };
-            api.put(
-              `/survey_questions/${this.enquete.vragen[x].surveyQuestionId}`,
-              questionData
-            );}
+
+            api
+              .post("/survey_questions", questionData)
+              .then((response) => {
+                this.questionId = response.data.id;
+
+                this.enquete.vragen[x].surveyQuestionId = this.questionId;
+              })
+              .then(() => {});
+          } else {
+            if (this.enquete.vragen[x].waarde) {
+              var questionData = {
+                title: this.enquete.vragen[x].waarde.vraag,
+                slug: this.enquete.vragen[x].waarde.vraag.replace(" ", "-"),
+                options: [this.enquete.vragen[x].waarde],
+                survey: `api/surveys/${this.id}`,
+              };
+              api.put(
+                `/survey_questions/${this.enquete.vragen[x].surveyQuestionId}`,
+                questionData
+              );
+            }
           }
         }
       }

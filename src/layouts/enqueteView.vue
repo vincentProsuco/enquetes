@@ -34,20 +34,22 @@
         <meer-keuze :question="question" v-if="question.options[0].type === 'Meerkeuze'"/>
         <selectie :question="question" v-if="question.options[0].type === 'Selecteren'"/>
         <tussen-pagina :question="question" v-if="question.options[0].type === 'Tussen'"/>
-        <rating :question="question" v-if="question.options[0].type === 'Rating'"/>
+        <rating :question="question" v-if="question.options[0].type === 'Rating'" @answered-question="updateAnswers($event)"/>
+        </q-tab-panel>
 
+        <q-tab-panel :name="lastTab">
+          <contact-info @contact-info="updateContactInfo($event)"/>
         </q-tab-panel>
-        <q-tab-panel name="finnish"
-        class="bg-secondary">
-          <div class="text-h6 flex flex-center">
-            <span v-html="eindtext" class="text-center"></span>
-          </div>
+        <q-tab-panel name="tabSend">
+          <span v-html="eindtext" class="flex flex-center"></span>
         </q-tab-panel>
+        {{responseInfo}}
       </q-tab-panels>
+
     </q-page-container>
 
     <q-footer class="bg-grey-3 text-white">
-      <q-toolbar class="flex flex-center bottomTool" v-if="tab != 'finnish' && status != false">
+      <q-toolbar class="flex flex-center bottomTool" v-if ="status != false">
         <q-tabs
           v-model="tab"
           class="text-grey-10"
@@ -59,7 +61,7 @@
             @click.prevent="tab--"
             label="Vorige"
             unelevated
-            v-if="tab != 0 && tab != 'finnish'"
+            v-if="tab != 0 && tab != 'tabSend'"
             class="navBtn"
             color="primary"
             flat
@@ -70,22 +72,13 @@
             @click.prevent="tab++"
             label="Volgende"
             unelevated
-            v-if="tab != survey.length - 1 && tab != 'finnish'"
+            v-if="tab != lastTab && tab != 'tabSend'"
             class="q-mx-md navBtn"
             color="primary"
             flat
             icon-right="o_navigate_next"
           />
-          <q-btn
-            @click.prevent="postSurvey"
-            label="Versturen"
-            color="primary"
-            unelevated
-            size="md"
-            class="q-mx-md sendBtn"
-            v-else
-            :disable="!status"
-          />
+          <q-btn v-if="tab === lastTab" color="primary" @click="postSurvey" label="Versturen"/>
         </q-tabs>
       </q-toolbar>
     </q-footer>
@@ -101,11 +94,42 @@ import MeerKeuze from 'src/components/public/meerKeuze.vue';
 import Selectie from 'src/components/public/selectie.vue';
 import TussenPagina from 'src/components/public/tussenPagina.vue';
 import Rating from 'src/components/public/rating.vue';
+import ContactInfo from 'src/components/public/contactInfo.vue';
 export default {
-  components: { openVraag, MeerKeuze, Selectie, TussenPagina, Rating },
+  components: { openVraag, MeerKeuze, Selectie, TussenPagina, Rating, ContactInfo },
   props:['demo'],
   setup() {
     var $q = useQuasar();
+  },
+  computed:{
+    responseInfo(){
+      var info = {
+          email:'******@*******.**',
+          firstName:'*****',
+          suffix:'***',
+          lastName:'******',
+          telephone:'******',
+          survey:this.$route.hash.substring(1, this.$route.hash.length),
+          answers:''
+        }
+      if(this.anoniem === false){
+          info.email = ''
+          info.firstName = ''
+          info.suffix = ''
+          info.lastName = ''
+          info.telephone = ''
+      }
+      return info
+    },
+    lastTab(){
+      if(this.anoniem === false){
+        return this.survey.length-1
+      }
+      else{
+        return this.survey.length
+      }
+      
+    }
   },
   mounted() {
     var id = this.$route.hash.substring(1, this.$route.hash.length);
@@ -130,6 +154,7 @@ export default {
       this.stijl = response.data.options[0]
       this.font = response.data.options[0].fontface
       this.status = response.data.status
+      this.anoniem = response.data.options[1].anoniem
       this.survey = response.data.questions;
       this.survey.sort(function (a, b) {
         return a.options[0].id - b.options[0].id;
@@ -149,6 +174,7 @@ export default {
       font:null,
       answers: [],
       eindtext: null,
+      anoniem:null,
       tab: 0,
       nmQuestions: 0,
       activeQuestion: 0,
@@ -158,18 +184,32 @@ export default {
   },
   methods: {
     postSurvey() {
+      console.log(this.responseInfo)
       this.$q.loading.show();
       setTimeout(() => {
         this.$q.loading.hide();
       }, 1500);
-      this.tab = "finnish";
+      this.tab = "tabSend";
     },
     active(i) {
       if (this.activeQuestion === i) {
         return true;
       }
     },
+    updateContactInfo(e){
+          this.responseInfo.email = e.email
+          this.responseInfo.firstName = e.firstName
+          this.responseInfo.suffix = e.suffix
+          this.responseInfo.lastName = e.lastName
+          this.responseInfo.telephone = e.telephone
+    },
+    updateAnswers(e){
+    alert()
+    this.answers.push(e)
+    console.log(this.answers)
+  }
   },
+  
 };
 </script>
 

@@ -128,9 +128,6 @@ export default {
     $q.loading.show();
     $store.dispatch("googlefonts/getFonts");
   },
-  beforeCreate(){
-    console.log('...before mount')
-  },
   mounted() {
     this.$q.loading.hide();
     this.$emit("updateEvent", { val: this.stijl, cat: "stijl" });
