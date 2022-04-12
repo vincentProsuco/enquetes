@@ -21,7 +21,8 @@
 
 <script>
 export default {
-    props:['question'],
+    props:['question', 'qid'],
+    emits:['answered-question'],
     computed:{          
         type(){
             var type
@@ -42,7 +43,15 @@ export default {
             antwoord:''
            
         }
-    }
+    },
+    watch:{
+        antwoord:{
+          deep:true,
+          handler(){
+            this.$emit('answered-question', {id:this.question.id, qId:this.qid, answers:this.antwoord})
+            }
+        }
+    },
     
 }
 </script>

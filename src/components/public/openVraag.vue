@@ -9,13 +9,20 @@
 
 <script>
 export default {
-    props:['question'],
+    props:['question', 'qid'],
+    emits:['answered-question'],
     data(){
         return{
             vraag:this.question.options[0].vraag,
             antwoord:'',
         }
-    }
+    },
+    watch:{
+        antwoord(){
+            this.$emit('answered-question', {id:this.question.id, qId:this.qid, answers:this.antwoord})
+        }
+    },
+
     
 }
 </script>

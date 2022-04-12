@@ -18,7 +18,8 @@
 
 <script>
 export default {
-    props:['question'],
+    props:['question', 'qid'],
+    emits:['answered-question'],
     mounted(){
         
             for(var i = 0; i<this.opties.length; i++){
@@ -34,7 +35,15 @@ export default {
             answers:[]
            
         }
-    }
+    },
+    watch:{
+        answers:{
+          deep:true,
+          handler(){
+            this.$emit('answered-question', {id:this.question.id, qId:this.qid, answers:this.answers})
+            }
+        }
+    },
     
 }
 </script>
