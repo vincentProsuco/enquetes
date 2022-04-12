@@ -29,8 +29,7 @@
           label="preview"
           color="primary"
           class="q-mr-sm"
-          @click="previewMode = true"
-          :disabled="preview"
+          v-if="save"
           unelevated
         />
         <q-tooltip style="overflow: hidden" v-if="preview">
@@ -151,13 +150,13 @@ export default defineComponent({
       enquete: {
         settings: null,
         stijl: {
-        fontface: { label: "Roboto", value: "Roboto" },
-        fontcolor: "#000",
-        achtergrondkleur: "#ffffff",
-        btncolor: "#26A69A",
-        textalign: "center",
-        logo: "top",
-      },
+          fontface: { label: "Roboto", value: "Roboto" },
+          fontcolor: "#000",
+          achtergrondkleur: "#ffffff",
+          btncolor: "#26A69A",
+          textalign: "center",
+          logo: "top",
+        },
         vragen: null,
       },
     };
@@ -166,11 +165,9 @@ export default defineComponent({
     updateEvent(e) {
       if (e.cat === "instellingen") {
         this.enquete.settings = e.val;
-      }
-      else if (e.cat === "stijl") {
+      } else if (e.cat === "stijl") {
         this.enquete.stijl = e.val;
-      }
-      else if (e.cat === "vragen") {
+      } else if (e.cat === "vragen") {
         this.enquete.vragen = e.val;
         for (var i = 0; i < this.enquete.vragen.length; i++) {
           this.enquete.vragen[i].id = i;
@@ -189,9 +186,12 @@ export default defineComponent({
         status: String(this.enquete.settings.status),
         completedDescription: this.enquete.settings.completedDescription,
         client: `api/clients/${this.enquete.settings.client.value.id}`,
-        options: [this.enquete.stijl, {anoniem:this.enquete.settings.anoniem}],
+        options: [
+          this.enquete.stijl,
+          { anoniem: this.enquete.settings.anoniem },
+        ],
       };
-      console.log(this.enquete.stijl);
+
       if (this.id === null) {
         var apiSettings = api
           .post("/surveys", settingsData)
@@ -202,15 +202,7 @@ export default defineComponent({
         var apiSettings = api.put(`/surveys/${this.id}`, settingsData);
       }
 
-      apiSettings.then(() => {
-        this.save = true;
-        this.$q.loading.hide();
-        this.$q.notify({
-          message: "Enquête opgeslagen",
-          icon: "check",
-          color: "secondary",
-        });
-      });
+      apiSettings;
 
       if (this.enquete.vragen != null) {
         for (var x = 0; x < this.enquete.vragen.length; x++) {
@@ -227,7 +219,7 @@ export default defineComponent({
               .then((response) => {
                 this.questionId = response.data.id;
 
-                this.enquete.vragen[x].surveyQuestionId = this.questionId;
+                // this.enquete.vragen[x].surveyQuestionId = this.questionId;
               })
               .then(() => {});
           } else {
@@ -246,6 +238,13 @@ export default defineComponent({
           }
         }
       }
+      this.save = true;
+      this.$q.loading.hide();
+      this.$q.notify({
+        message: "Enquête opgeslagen",
+        icon: "check",
+        color: "secondary",
+      });
     },
   },
   watch: {

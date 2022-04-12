@@ -39,7 +39,14 @@ export default {
   emits:['answered-question'],
   mounted(){
     for(var sv =0; sv < this.question.options[0].subvraag.length; sv++){
+      if(this.ratingStijl === 'tekst'){
         this.antwoorden.push('')
+      }
+      else{
+        console.log(this.ratingStijl)
+        this.antwoorden.push(1)
+      }
+        
       }
   },
   computed: {

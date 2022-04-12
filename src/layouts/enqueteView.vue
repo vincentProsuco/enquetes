@@ -11,12 +11,6 @@
     </q-page-container>
   </q-layout>
   <q-layout view="hHh LpR fFf" v-else>
-    <q-toolbar class="bg-warning flex flex-center" v-if="status === null">
-      <span class="text-bold">
-        <q-icon name="o_warning" />
-        Let op: Enquête is in testmodus!
-      </span>
-    </q-toolbar>
     <q-page-container class="box">
       <div class="flex flex-center">
         <img
@@ -69,7 +63,6 @@
         <q-tab-panel name="tabSend">
           <span v-html="eindtext" class="flex flex-center"></span>
         </q-tab-panel>
-        {{ responseInfo }}
       </q-tab-panels>
     </q-page-container>
 
@@ -103,7 +96,7 @@
             icon-right="o_navigate_next"
           />
           <q-btn
-            v-if="tab === lastTab"
+            v-if="tab === lastTab && status != 'null'"
             color="primary"
             @click="postSurvey"
             label="Versturen"
@@ -136,6 +129,9 @@ export default {
   props: ["demo"],
   setup() {
     var $q = useQuasar();
+        const d = new Date();
+    d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
+    let expires = "expires=" + d.toUTCString();
   },
   computed: {
     responseInfo() {
@@ -170,6 +166,9 @@ export default {
   },
   mounted() {
     var id = this.$route.hash.substring(1, this.$route.hash.length);
+ 
+    document.cookie = "id" + "=" + id + ";" + this.expires + ";path=/";
+
     var client = this.$route.path.split("/").pop();
     api.get(`/surveys/${id}`).then((response) => {
       if (
@@ -230,14 +229,6 @@ export default {
   },
   methods: {
     postSurvey() {
-      // var data = {
-      //   surveyResponse:this.responseInfo,
-      //   answers:this.answers
-      // }
-      // this.$q.loading.show();
-      // api.post('survey_responses', data).then((response)=>{
-      //   console.log(response)
-      // })
       for (var i = 0; i < this.answers.length; i++) {
         var data = {
           surveyQuestion: `api/survey_questions/${this.answers[i].question}`,
@@ -268,7 +259,7 @@ export default {
     },
     updateAnswers(e) {
       this.answers[e.qId] = {question:e.id, answers:e.answers};
-      console.log(this.answers);
+     
     },
   },
 };

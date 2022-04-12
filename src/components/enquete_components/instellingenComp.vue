@@ -41,7 +41,7 @@
             <q-list bordered class="q-mt-md">
             <q-item tag="label" v-ripple>
               <q-item-section>
-                <q-item-label class="text-bold">Anoniem invullen toestaan?</q-item-label>
+                <q-item-label class="text-bold">Gegevens verplicht?</q-item-label>
               </q-item-section>
               <q-item-section avatar>
                 <q-toggle
@@ -95,7 +95,6 @@ export default {
   },
   watch: {
     editData(val) {
-      console.log(val)
       if (val.status === "true") {
         this.settings.status = true;
       }

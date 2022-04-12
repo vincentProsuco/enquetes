@@ -14,7 +14,6 @@
             @filter="filterFn"
             outlined
             :loading="loading"
-            @virtual-scroll="onScroll"
           >
             <template v-slot:no-option>
               <q-item>
@@ -131,12 +130,13 @@ export default {
   mounted() {
     this.$q.loading.hide();
     this.$emit("updateEvent", { val: this.stijl, cat: "stijl" });
-    if (this.editData.options[0]) {
+    if (this.editData!= null) {
       this.stijl.fontface = this.editData.options[0].fontface;
       this.stijl.fontcolor = this.editData.options[0].fontcolor;
       this.stijl.achtergrondkleur = this.editData.options[0].achtergrondkleur;
       this.stijl.btncolor = this.editData.options[0].btncolor;
     }
+    
   },
   data() {
     return {
@@ -163,10 +163,7 @@ export default {
       handler() {
         this.$emit("updateEvent", { val: this.stijl, cat: "stijl" });
       },
-    },
-    editData(val) {
-      console.log(val);
-    },
+    }
   },
   methods: {
     filterFn(val, update) {
